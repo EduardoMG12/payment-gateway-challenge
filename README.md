@@ -1,23 +1,37 @@
 # Como Rodar o Projeto
 
-Para iniciar o projeto, você precisa ter o Docker, Docker Compose e o sqlx instalados. O projeto foi configurado como um monorepo, e todas as dependências de infraestrutura são gerenciadas pelo docker-compose.yml na raiz.
+Para iniciar o projeto, a forma mais rápida e recomendada é usar o script de setup. Ele automatiza a configuração do ambiente, a instalação das dependências e a preparação do banco de dados para desenvolvimento.
 
-Caso ainda não possua, baixe e instale o sqlx-cli para gerenciar as migrações do banco de dados.
+Se você não tem Docker e Docker Compose instalados, instale-os antes de começar. Se você também não tiver o sqlx-cli instalado, ele será necessário para as migrações do banco de dados.
 
-1. Configurar o Ambiente
+1. Setup Rápido para Desenvolvedores
 
-Primeiro, crie seu arquivo de variáveis de ambiente. A partir da raiz do projeto, copie o arquivo de exemplo e, em seguida, preencha-o com as suas credenciais.
+Primeiro, torne o script executável. A partir da raiz do projeto, execute o comando:
+```Bash
+
+chmod +x scripts/setup.sh
+
+```
+
+Em seguida, rode o script. Ele irá:
+
+    Copiar o arquivo .env.example para .env.
+
+    Instalar as dependências do Node.js.
+
+    Configurar o Husky para os hooks do Git.
 
 ```Bash
 
-cp .env.example .env
+./scripts/setup.sh
 
 ```
+
+Depois de executar o script, abra o arquivo .env para configurar as credenciais do seu banco de dados.
 
 2. Inicializar a Infraestrutura e o Banco de Dados
 
 Agora, inicie os contêineres do PostgreSQL e do RabbitMQ. Eles serão executados em segundo plano.
-
 
 ```Bash
 
@@ -33,7 +47,6 @@ export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:
 sqlx migrate run
 
 ```
-
 
 3. Executar a Aplicação Go
 

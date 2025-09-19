@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Para iniciar o projeto, você precisa ter o Docker, Docker Compose e o sqlx instalados. O projeto foi configurado como um monorepo, e todas as dependências de infraestrutura são gerenciadas pelo docker-compose.yml na raiz.",
   "main": "index.js",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EduardoMG12/payment-gateway-challenge.git"
@@ -19,5 +18,8 @@
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6"
+  },
+  "scripts": {
+    "prepare": "husky"
   }
 }
