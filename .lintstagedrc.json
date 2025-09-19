@@ -1,0 +1,4 @@
+{
+    "*.rs": ["cargo fmt --"],
+    "*.go": ["goimports -w"]
+  }
