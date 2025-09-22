@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"payment-gateway/go-api/internal/account"
+	"payment-gateway/go-api/internal/card"
 	"payment-gateway/go-api/internal/config"
 	"payment-gateway/go-api/internal/database"
 	"payment-gateway/go-api/internal/repository"
-
-	httpSwagger "github.com/swaggo/http-swagger"
+	"payment-gateway/go-api/internal/router"
 
 	_ "payment-gateway/go-api/docs"
 
@@ -38,21 +39,16 @@ func main() {
 	accountService := account.NewAccountService(accountRepo)
 	accountHandler := account.NewAccountHandler(accountService)
 
-	http.HandleFunc("/accounts", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case "POST":
-			accountHandler.CreateAccount(w, r)
-		case "GET":
-			accountHandler.GetAllAccounts(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	})
+	cardRepo := repository.NewCardRepository(db)
+	cardService := card.NewCardService(cardRepo, accountService)
+	cardHandler := card.NewCardHandler(cardService)
+
+	r := router.NewRouter(accountHandler, cardHandler)
+	r.RegisterRoutes()
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, World!")
 	})
-
-	http.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	fmt.Println("Server up\nPORT:8080\nhttp://localhost:8080")
 	fmt.Printf("API Swagger doc up: http://localhost:8080/swagger")

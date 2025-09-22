@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  api.APIError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   dto.CreateAccountRequest:
     properties:
       username:
@@ -8,6 +15,13 @@ definitions:
         type: string
     required:
     - username
+    type: object
+  dto.CreateCardRequest:
+    properties:
+      account_id:
+        type: string
+    required:
+    - account_id
     type: object
   models.Account:
     properties:
@@ -18,6 +32,19 @@ definitions:
       updated_at:
         type: string
       username:
+        type: string
+    type: object
+  models.Card:
+    properties:
+      account_id:
+        type: string
+      card_token:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      last_four_digits:
         type: string
     type: object
 host: localhost:8080
@@ -74,6 +101,36 @@ paths:
       summary: Create a new account
       tags:
       - accounts
+  /cards:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new, fictional card and associates it with an account.
+      parameters:
+      - description: Account ID to associate the new card
+        in: body
+        name: card
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCardRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Card'
+        "400":
+          description: Invalid request body or validation failed
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "500":
+          description: Failed to create card
+          schema:
+            $ref: '#/definitions/api.APIError'
+      summary: Create a new card
+      tags:
+      - cards
 schemes:
 - http
 swagger: "2.0"

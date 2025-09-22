@@ -22,12 +22,19 @@ func NewCardRepository(db *sqlx.DB) CardRepository {
 
 func (r *cardRepositoryImpl) CreateCard(ctx context.Context, card *models.Card) error {
 	query := `
-		INSER INTO cards (account_id, card_token) VALUES ($1, $2) RETURNING id;	
-	`
-	err := r.db.QueryRowContext(ctx, query, card.AccountID, card.CardToken).Scan(&card.ID)
+        INSERT INTO cards (account_id, card_token, last_four_digits)
+        VALUES ($1, $2, $3)
+        RETURNING id, card_token, last_four_digits, created_at;
+    `
+	err := r.db.QueryRowContext(ctx, query, card.AccountID, card.CardToken, card.LastFourDigits).Scan(
+		&card.ID,
+		&card.CardToken,
+		&card.LastFourDigits,
+		&card.CreatedAt,
+	)
 
 	if err != nil {
-		return fmt.Errorf("failed to create account: %w", err)
+		return fmt.Errorf("failed to create card: %w", err)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"payment-gateway/go-api/internal/models"
 
@@ -11,6 +12,7 @@ import (
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, account *models.Account) error
 	GetAllAccounts(ctx context.Context, page, limit int) ([]*models.Account, error)
+	GetAccountById(ctx context.Context, id string) (*models.Account, error)
 }
 
 type accountRepositoryImpl struct {
@@ -50,4 +52,18 @@ func (r *accountRepositoryImpl) GetAllAccounts(ctx context.Context, page, limit 
 		return nil, fmt.Errorf("failed to get accounts: %w", err)
 	}
 	return accounts, nil
+}
+
+func (r *accountRepositoryImpl) GetAccountById(ctx context.Context, accountID string) (*models.Account, error) {
+	query := `SELECT * FROM accounts WHERE id = $1`
+	var account models.Account
+	err := r.db.GetContext(ctx, &account, query, accountID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get account by id: %w", err)
+	}
+
+	return &account, nil
 }

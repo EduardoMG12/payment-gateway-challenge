@@ -9,6 +9,7 @@ import (
 type AccountService interface {
 	CreateAccount(ctx context.Context, username string) (*models.Account, error)
 	GetAllAccounts(ctx context.Context, page, limit int) ([]*models.Account, error)
+	GetAccountById(ctx context.Context, id string) (*models.Account, error)
 }
 
 type accountServiceImpl struct {
@@ -36,4 +37,12 @@ func (s *accountServiceImpl) GetAllAccounts(ctx context.Context, page, limit int
 		return nil, err
 	}
 	return accounts, nil
+}
+
+func (s *accountServiceImpl) GetAccountById(ctx context.Context, id string) (*models.Account, error) {
+	account, err := s.repo.GetAccountById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return account, nil
 }
