@@ -1,11 +1,79 @@
 basePath: /
+definitions:
+  dto.CreateAccountRequest:
+    properties:
+      username:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - username
+    type: object
+  models.Account:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: This is a main payment-gateway API .
   title: Payment Gateway API
   version: "1.0"
-paths: {}
+paths:
+  /accounts:
+    get:
+      description: Returns a list of all accounts, with pagination support.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Account'
+            type: array
+      summary: Get all accounts with pagination
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: Creates a new account with a username.
+      parameters:
+      - description: Account data for creation
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Account'
+      summary: Create a new account
+      tags:
+      - accounts
 schemes:
 - http
 swagger: "2.0"
