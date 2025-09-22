@@ -7,7 +7,7 @@ type Card struct {
 
 	// @Description The unique identifier of the account this card belongs to.
 	// @Example 550e8400-e29b-41d4-a716-446655440000
-	AccountID string `json:"account_id" db:"account_id"`
+	AccountId string `json:"account_id" db:"account_id"`
 
 	// @Description The unique, irreversible token for the card.
 	// @Example 5b7c16af7278094cd14bd041079111ed00fa832c8a460d8e3f40156408d99475

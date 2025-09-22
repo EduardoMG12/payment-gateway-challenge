@@ -8,6 +8,7 @@ import (
 	"payment-gateway/go-api/internal/i18n"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 type CardHandler struct {
@@ -47,7 +48,7 @@ func (h *CardHandler) CreateCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	card, err := h.service.CreateCard(r.Context(), req.AccountID)
+	card, err := h.service.CreateCard(r.Context(), req.AccountId)
 	if err != nil {
 		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFailedToCreateCard))
 		return
@@ -56,4 +57,21 @@ func (h *CardHandler) CreateCard(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(card)
+}
+
+func (h *CardHandler) GetAllCardsByAccountId(w http.ResponseWriter, r *http.Request) {
+	lang := i18n.GetLangFromHeader(r)
+
+	vars := mux.Vars(r)
+	accountId := vars["accountId"]
+
+	cards, err := h.service.GetAllCardsByAccountId(r.Context(), accountId)
+	if err != nil {
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorToFindCards))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(cards)
 }

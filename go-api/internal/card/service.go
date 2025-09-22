@@ -12,7 +12,7 @@ import (
 
 type CardService interface {
 	CreateCard(ctx context.Context, accountID string) (*models.Card, error)
-	GetAllAccountCards(ctx context.Context, accountID, cardToken string) ([]*models.Card, error)
+	GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error)
 }
 
 type cardServiceImpl struct {
@@ -45,7 +45,7 @@ func (s *cardServiceImpl) CreateCard(ctx context.Context, accountID string) (*mo
 	lastFourDigits := cardNumber[len(cardNumber)-4:]
 
 	card := &models.Card{
-		AccountID:      account.ID,
+		AccountId:      account.ID,
 		CardToken:      cardToken,
 		LastFourDigits: lastFourDigits,
 	}
@@ -57,6 +57,20 @@ func (s *cardServiceImpl) CreateCard(ctx context.Context, accountID string) (*mo
 	return card, nil
 }
 
-func (s *cardServiceImpl) GetAllAccountCards(ctx context.Context, accountID, cardToken string) ([]*models.Card, error) {
-	panic("unimplemented")
+func (s *cardServiceImpl) GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error) {
+	account, err := s.accountService.GetAccountById(ctx, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	if account == nil {
+		return nil, fmt.Errorf("account not found")
+	}
+
+	cards, err := s.repo.GetAllCardsByAccountId(ctx, account.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cards: %w", err)
+	}
+
+	return cards, nil
 }

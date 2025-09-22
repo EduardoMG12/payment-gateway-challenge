@@ -10,6 +10,7 @@ import (
 
 type CardRepository interface {
 	CreateCard(ctx context.Context, card *models.Card) error
+	GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error)
 }
 
 type cardRepositoryImpl struct {
@@ -26,7 +27,7 @@ func (r *cardRepositoryImpl) CreateCard(ctx context.Context, card *models.Card) 
         VALUES ($1, $2, $3)
         RETURNING id, card_token, last_four_digits, created_at;
     `
-	err := r.db.QueryRowContext(ctx, query, card.AccountID, card.CardToken, card.LastFourDigits).Scan(
+	err := r.db.QueryRowContext(ctx, query, card.AccountId, card.CardToken, card.LastFourDigits).Scan(
 		&card.ID,
 		&card.CardToken,
 		&card.LastFourDigits,
@@ -38,4 +39,19 @@ func (r *cardRepositoryImpl) CreateCard(ctx context.Context, card *models.Card) 
 	}
 
 	return nil
+}
+
+func (r *cardRepositoryImpl) GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error) {
+	query := `
+        SELECT * FROM cards WHERE account_id = $1;
+    `
+	var cards []*models.Card
+
+	err := r.db.SelectContext(ctx, &cards, query, accountId)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cards: %w", err)
+	}
+
+	return cards, nil
 }

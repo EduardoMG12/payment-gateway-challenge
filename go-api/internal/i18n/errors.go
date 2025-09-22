@@ -21,6 +21,7 @@ const (
 	ErrorFailedToCreateTransaction = "failed_to_create_transaction"
 	ErrorFailedToGetAccounts       = "failed_to_get_accounts"
 	PaginationLimitExceeded        = "pagination_limit_exceeded"
+	ErrorToFindCards               = "error_to_find_cards"
 )
 
 var errorMessages = map[string]map[string]string{
@@ -40,6 +41,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorFailedToCreateTransaction: "Failed to create transaction",
 		ErrorFailedToGetAccounts:       "Failed to get accounts",
 		PaginationLimitExceeded:        "Pagination limit exceeded",
+		ErrorToFindCards:               "Error to find cards",
 	},
 	"pt-br": {
 		ErrorInvalidRequestBody:        "Corpo da requisição inválido",
@@ -57,6 +59,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorFailedToCreateTransaction: "Falha ao criar a transação",
 		ErrorFailedToGetAccounts:       "Falha ao buscar contas",
 		PaginationLimitExceeded:        "Limite de paginação excedido",
+		ErrorToFindCards:               "Erro ao buscar cartões",
 	},
 }
 
