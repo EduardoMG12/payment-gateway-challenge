@@ -2,16 +2,16 @@
 
 Para iniciar o projeto, a forma mais rápida e recomendada é usar o script de setup. Ele automatiza a configuração do ambiente, a instalação das dependências e a preparação do banco de dados para desenvolvimento.
 
-Se você não tem Docker e Docker Compose instalados, instale-os antes de começar. Se você também não tiver o sqlx-cli instalado, ele será necessário para as migrações do banco de dados.
+Se você não tem Docker e Docker Compose instalados, instale-os antes de começar. Caso ainda não possua, baixe e instale o sqlx-cli para gerenciar as migrações do banco de dados.
 
 1. Setup Rápido para Desenvolvedores
 
 Primeiro, torne o script executável. A partir da raiz do projeto, execute o comando:
-```Bash
+```sh
 
 chmod +x scripts/setup.sh
 
-```
+``
 
 Em seguida, rode o script. Ele irá:
 
@@ -21,7 +21,7 @@ Em seguida, rode o script. Ele irá:
 
     Configurar o Husky para os hooks do Git.
 
-```Bash
+```sh
 
 ./scripts/setup.sh
 
@@ -33,7 +33,7 @@ Depois de executar o script, abra o arquivo .env para configurar as credenciais 
 
 Agora, inicie os contêineres do PostgreSQL e do RabbitMQ. Eles serão executados em segundo plano.
 
-```Bash
+```sh
 
 docker-compose up -d
 
@@ -41,7 +41,7 @@ docker-compose up -d
 
 Em seguida, exporte a variável de ambiente DATABASE_URL no seu terminal e rode as migrações do banco de dados. Isso irá criar as tabelas necessárias para a aplicação.
 
-```Bash
+```sh
 
 export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
 sqlx migrate run
@@ -54,7 +54,7 @@ Com a infraestrutura e o banco de dados configurados, você pode iniciar o servi
 
 Vá para o diretório go-api e execute o comando:
 
-```Bash
+```sh
 
 go run cmd/main.go
 
@@ -66,7 +66,7 @@ Próximos Passos
 
 Se você precisar parar todos os contêineres e remover os volumes associados, vá para a raiz do projeto e execute:
 
-```Bash
+```sh
 
 docker-compose down --volumes
 
