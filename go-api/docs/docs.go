@@ -131,6 +131,56 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/cards/{accountId}": {
+            "get": {
+                "description": "Returns a list of all cards associated with an account, ordered by creation date.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Get all cards by account ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the account",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Card"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve cards",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

@@ -59,6 +59,16 @@ func (h *CardHandler) CreateCard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(card)
 }
 
+// @Summary Get all cards by account ID
+// @Description Returns a list of all cards associated with an account, ordered by creation date.
+// @Tags cards
+// @Produce json
+// @Param accountId path string true "ID of the account"
+// @Success 200 {array} models.Card
+// @Failure 400 {object} api.APIError "Invalid request or validation failed"
+// @Failure 404 {object} api.APIError "Account not found"
+// @Failure 500 {object} api.APIError "Failed to retrieve cards"
+// @Router /cards/{accountId} [get]
 func (h *CardHandler) GetAllCardsByAccountId(w http.ResponseWriter, r *http.Request) {
 	lang := i18n.GetLangFromHeader(r)
 

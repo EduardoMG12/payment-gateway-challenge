@@ -42,7 +42,7 @@ func main() {
 
 	fmt.Println("Server running 🚀🚀🚀   PORT:8080")
 	fmt.Println("go-api: http://localhost:8080")
-	fmt.Printf("API Swagger doc up: http://localhost:8080/swagger")
+	fmt.Printf("API Swagger doc up: http://localhost:8080/swagger/index.html")
 
 	log.Fatal(http.ListenAndServe(":8080", r.MuxRouter()))
 }

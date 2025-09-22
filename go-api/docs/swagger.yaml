@@ -164,6 +164,40 @@ paths:
       summary: Create a new card
       tags:
       - cards
+  /cards/{accountId}:
+    get:
+      description: Returns a list of all cards associated with an account, ordered
+        by creation date.
+      parameters:
+      - description: ID of the account
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Card'
+            type: array
+        "400":
+          description: Invalid request or validation failed
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "404":
+          description: Account not found
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "500":
+          description: Failed to retrieve cards
+          schema:
+            $ref: '#/definitions/api.APIError'
+      summary: Get all cards by account ID
+      tags:
+      - cards
 schemes:
 - http
 swagger: "2.0"
