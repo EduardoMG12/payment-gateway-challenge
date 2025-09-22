@@ -9,7 +9,6 @@ import (
 	"payment-gateway/go-api/internal/card"
 	"payment-gateway/go-api/internal/config"
 	"payment-gateway/go-api/internal/database"
-	"payment-gateway/go-api/internal/repository"
 	"payment-gateway/go-api/internal/router"
 
 	_ "payment-gateway/go-api/docs"
@@ -35,23 +34,15 @@ func main() {
 	}
 	defer db.Close()
 
-	accountRepo := repository.NewAccountRepository(db)
-	accountService := account.NewAccountService(accountRepo)
-	accountHandler := account.NewAccountHandler(accountService)
+	accountModule := account.NewModule(db)
+	cardModule := card.NewModule(db, accountModule.Service)
 
-	cardRepo := repository.NewCardRepository(db)
-	cardService := card.NewCardService(cardRepo, accountService)
-	cardHandler := card.NewCardHandler(cardService)
-
-	r := router.NewRouter(accountHandler, cardHandler)
+	r := router.NewRouter(accountModule.Handler, cardModule.Handler)
 	r.RegisterRoutes()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	})
-
-	fmt.Println("Server up\nPORT:8080\nhttp://localhost:8080")
+	fmt.Println("Server running 🚀🚀🚀   PORT:8080")
+	fmt.Println("go-api: http://localhost:8080")
 	fmt.Printf("API Swagger doc up: http://localhost:8080/swagger")
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", r.MuxRouter()))
 }
