@@ -152,6 +152,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "username": {
+                    "description": "@Description The username of the new account.\n@Example charlie",
                     "type": "string",
                     "maxLength": 100,
                     "minLength": 3
@@ -165,6 +166,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "account_id": {
+                    "description": "@Description Account ID to associate the new card\n@Example e252f5dd-ded2-4a30-a4a5-6e2940008d54",
                     "type": "string"
                 }
             }
@@ -173,15 +175,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
+                    "description": "@Description The creation timestamp of the account.\n@Example 2025-09-22T19:15:24.526505Z",
                     "type": "string"
                 },
                 "id": {
+                    "description": "@Description The unique identifier of the account.\n@Example 550e8400-e29b-41d4-a716-446655440000",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "@Description The last update timestamp of the account.\n@Example 2025-09-22T19:15:24.526505Z",
                     "type": "string"
                 },
                 "username": {
+                    "description": "@Description The unique username for the account.\n@Example charlie",
                     "type": "string"
                 }
             }
@@ -190,18 +196,23 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
+                    "description": "@Description The unique identifier of the account this card belongs to.\n@Example 550e8400-e29b-41d4-a716-446655440000",
                     "type": "string"
                 },
                 "card_token": {
+                    "description": "@Description The unique, irreversible token for the card.\n@Example 5b7c16af7278094cd14bd041079111ed00fa832c8a460d8e3f40156408d99475",
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "@Description The creation timestamp of the card.\n@Example 2025-09-22T19:15:24.526505Z",
                     "type": "string"
                 },
                 "id": {
+                    "description": "@Description The unique identifier of the card.\n@Example 550e8400-e29b-41d4-a716-446655440000",
                     "type": "string"
                 },
                 "last_four_digits": {
+                    "description": "@Description The last four digits of the card number for identification.\n@Example 8995",
                     "type": "string"
                 }
             }
