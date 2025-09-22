@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"payment-gateway/go-api/internal/account"
 	"payment-gateway/go-api/internal/config"
 	"payment-gateway/go-api/internal/database"
+	"payment-gateway/go-api/internal/repository"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -32,6 +34,20 @@ func main() {
 	}
 	defer db.Close()
 
+	accountRepo := repository.NewAccountRepository(db)
+	accountService := account.NewAccountService(accountRepo)
+	accountHandler := account.NewAccountHandler(accountService)
+
+	http.HandleFunc("/accounts", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "POST":
+			accountHandler.CreateAccount(w, r)
+		case "GET":
+			accountHandler.GetAllAccounts(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, World!")
 	})
