@@ -181,6 +181,90 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/transactions": {
+            "post": {
+                "description": "Creates a new transaction in the payment gateway.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a new transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction data",
+                        "name": "transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseCreateTransactionRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{accountId}": {
+            "get": {
+                "description": "Returns a list of transactions for a specific account.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get transactions by Account ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ResponseCreateTransactionRequest"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.APIError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -218,6 +302,72 @@ const docTemplate = `{
                 "account_id": {
                     "description": "@Description Account ID to associate the new card\n@Example e252f5dd-ded2-4a30-a4a5-6e2940008d54",
                     "type": "string"
+                }
+            }
+        },
+        "dto.CreateTransactionRequest": {
+            "type": "object",
+            "required": [
+                "account_id",
+                "amount_cents",
+                "type"
+            ],
+            "properties": {
+                "account_id": {
+                    "description": "@Description The account's ID for which the transaction will be performed.\n@Example e7b40123-cb12-41fa-b5bc-5a128448027e",
+                    "type": "string"
+                },
+                "amount_cents": {
+                    "description": "@Description The transaction amount in cents. Must be a positive integer.\n@Example 10000",
+                    "type": "integer"
+                },
+                "card_token": {
+                    "description": "@Description The credit card token (optional for some transaction types like DEPOSIT).\n@Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6",
+                    "type": "string",
+                    "maxLength": 126,
+                    "minLength": 20
+                },
+                "type": {
+                    "description": "@Description The type of transaction. Valid options are: DEPOSIT, PURCHASE, REFUND, CHARGE.\n@Example PURCHASE",
+                    "type": "string",
+                    "enum": [
+                        "DEPOSIT",
+                        "PURCHASE",
+                        "REFUND",
+                        "CHARGE"
+                    ]
+                }
+            }
+        },
+        "dto.ResponseCreateTransactionRequest": {
+            "type": "object",
+            "required": [
+                "account_id",
+                "amount_cents",
+                "type"
+            ],
+            "properties": {
+                "account_id": {
+                    "description": "@Description The ID of the account associated with the transaction.\n@Example e7b40123-cb12-41fa-b5bc-5a128448027e",
+                    "type": "string"
+                },
+                "amount_cents": {
+                    "description": "@Description The transaction amount in cents.\n@Example 10000",
+                    "type": "integer"
+                },
+                "card_id": {
+                    "description": "@Description The ID of the credit card used for the transaction. It will be null if no card was associated with the transaction.\n@Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "@Description The type of the transaction.\n@Example PURCHASE",
+                    "type": "string",
+                    "enum": [
+                        "DEPOSIT",
+                        "PURCHASE",
+                        "REFUND",
+                        "CHARGE"
+                    ]
                 }
             }
         },

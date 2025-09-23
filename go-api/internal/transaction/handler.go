@@ -23,6 +23,15 @@ func NewTransactionHandler(service TransactionService) *TransactionHandler {
 	}
 }
 
+// @Summary Create a new transaction
+// @Description Creates a new transaction in the payment gateway.
+// @Accept json
+// @Produce json
+// @Param transaction body dto.CreateTransactionRequest true "Transaction data"
+// @Success 201 {object} dto.ResponseCreateTransactionRequest
+// @Failure 400 {object} api.APIError "Invalid request"
+// @Failure 500 {object} api.APIError "Internal server error"
+// @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	lang := i18n.GetLangFromHeader(r)
 
@@ -50,4 +59,13 @@ func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(createTx)
 }
 
+// @Summary Get transactions by Account ID
+// @Description Returns a list of transactions for a specific account.
+// @Accept json
+// @Produce json
+// @Param accountId path string true "Account ID"
+// @Success 200 {array} dto.ResponseCreateTransactionRequest
+// @Failure 404 "Account not found"
+// @Failure 500 {object} api.APIError "Internal server error"
+// @Router /transactions/{accountId} [get]
 func (h *TransactionHandler) GetTransactionByAccountId(w http.ResponseWriter, r *http.Request) {}
