@@ -9,6 +9,7 @@ import (
 
 type Module struct {
 	Handler *CardHandler
+	Service CardService
 }
 
 func NewModule(db *sqlx.DB, accountService account.AccountService) *Module {
@@ -18,5 +19,6 @@ func NewModule(db *sqlx.DB, accountService account.AccountService) *Module {
 
 	return &Module{
 		Handler: handler,
+		Service: service,
 	}
 }

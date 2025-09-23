@@ -1,0 +1,1 @@
+ALTER TABLE transactions ALTER COLUMN card_id DROP NOT NULL;

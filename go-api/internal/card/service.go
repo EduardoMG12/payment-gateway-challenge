@@ -13,6 +13,7 @@ import (
 type CardService interface {
 	CreateCard(ctx context.Context, accountID string) (*models.Card, error)
 	GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error)
+	GetCardByTokenAndAccountId(ctx context.Context, cardToken, accountId string) (string, error)
 }
 
 type cardServiceImpl struct {
@@ -73,4 +74,18 @@ func (s *cardServiceImpl) GetAllCardsByAccountId(ctx context.Context, accountId 
 	}
 
 	return cards, nil
+}
+
+func (s *cardServiceImpl) GetCardByTokenAndAccountId(ctx context.Context, cardToken, accountId string) (string, error) {
+	card, err := s.repo.GetCardByTokenAndAccountId(ctx, cardToken, accountId)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to get card by token and account id: %w", err)
+	}
+
+	if card == "" {
+		return "", fmt.Errorf("card not found")
+	}
+
+	return card, nil
 }

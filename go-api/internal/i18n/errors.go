@@ -22,6 +22,8 @@ const (
 	ErrorFailedToGetAccounts       = "failed_to_get_accounts"
 	PaginationLimitExceeded        = "pagination_limit_exceeded"
 	ErrorToFindCards               = "error_to_find_cards"
+	ErrorCreatingTransaction       = "error_creating_transaction"
+	ErrIdempotencyKeyExists        = "err_idempotency_key_exists"
 )
 
 var errorMessages = map[string]map[string]string{
@@ -42,6 +44,8 @@ var errorMessages = map[string]map[string]string{
 		ErrorFailedToGetAccounts:       "Failed to get accounts",
 		PaginationLimitExceeded:        "Pagination limit exceeded",
 		ErrorToFindCards:               "Error to find cards",
+		ErrorCreatingTransaction:       "Error creating transaction",
+		ErrIdempotencyKeyExists:        "Idempotency key already exists",
 	},
 	"pt-br": {
 		ErrorInvalidRequestBody:        "Corpo da requisição inválido",
@@ -60,6 +64,8 @@ var errorMessages = map[string]map[string]string{
 		ErrorFailedToGetAccounts:       "Falha ao buscar contas",
 		PaginationLimitExceeded:        "Limite de paginação excedido",
 		ErrorToFindCards:               "Erro ao buscar cartões",
+		ErrorCreatingTransaction:       "Erro ao criar a transação",
+		ErrIdempotencyKeyExists:        "Chave de idempotência já existe",
 	},
 }
 

@@ -10,6 +10,8 @@ import (
 	"payment-gateway/go-api/internal/config"
 	"payment-gateway/go-api/internal/database"
 	"payment-gateway/go-api/internal/router"
+	"payment-gateway/go-api/internal/transaction"
+	"payment-gateway/go-api/internal/utils"
 
 	_ "payment-gateway/go-api/docs"
 
@@ -34,10 +36,17 @@ func main() {
 	}
 	defer db.Close()
 
-	accountModule := account.NewModule(db)
-	cardModule := card.NewModule(db, accountModule.Service)
+	amqpURI := "amqp://guest:guest@localhost:5672/"
+	mqClient, err := utils.NewRabbitMQClient(amqpURI)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+	}
 
-	r := router.NewRouter(accountModule.Handler, cardModule.Handler)
+	accountModule := account.NewModule(db)
+	cardModule := *card.NewModule(db, accountModule.Service)
+	transactionModule := transaction.NewModule(db, accountModule.Service, mqClient, cardModule.Service)
+
+	r := router.NewRouter(accountModule.Handler, cardModule.Handler, transactionModule.Handler)
 	r.RegisterRoutes()
 
 	fmt.Println("Server running 🚀🚀🚀   PORT:8080")

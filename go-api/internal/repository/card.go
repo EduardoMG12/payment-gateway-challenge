@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"payment-gateway/go-api/internal/models"
 
@@ -11,6 +12,7 @@ import (
 type CardRepository interface {
 	CreateCard(ctx context.Context, card *models.Card) error
 	GetAllCardsByAccountId(ctx context.Context, accountId string) ([]*models.Card, error)
+	GetCardByTokenAndAccountId(ctx context.Context, cardToken, accountId string) (string, error)
 }
 
 type cardRepositoryImpl struct {
@@ -54,4 +56,21 @@ func (r *cardRepositoryImpl) GetAllCardsByAccountId(ctx context.Context, account
 	}
 
 	return cards, nil
+}
+
+func (r *cardRepositoryImpl) GetCardByTokenAndAccountId(ctx context.Context, cardToken, accountId string) (string, error) {
+	query := `
+        SELECT id FROM cards WHERE card_token = $1 AND account_id = $2;
+    `
+	var cardId string
+
+	err := r.db.GetContext(ctx, &cardId, query, cardToken, accountId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("card not found for given token and account id: %w", err)
+		}
+		return "", fmt.Errorf("failed to get card by token and account id: %w", err)
+	}
+
+	return cardId, nil
 }
