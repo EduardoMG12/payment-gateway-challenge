@@ -1,4 +1,6 @@
 {
-    "*.rs": ["cargo fmt --"],
-    "*.go": ["goimports -w"]
-  }
+	"rust-processor/**/*.rs": [
+		"cargo fmt --manifest-path rust-processor/Cargo.toml --"
+	],
+	"*.go": ["goimports -w"]
+}
