@@ -1,0 +1,13 @@
+services:
+
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./go-api:/app
+    ports:
+      - "${API_PORT}:8080"
+    env_file:
+      - .env.development
+     

@@ -1,4 +1,6 @@
 .env
+.env.development
 node_modules
 
+tmp
 target

@@ -1,0 +1,5 @@
+# .air.toml
+[build]
+cmd = "go build -o ./tmp/go-api ./cmd/main.go"
+bin = "tmp/go-api"
+full_bin = "./tmp/go-api"

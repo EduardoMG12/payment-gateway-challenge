@@ -33,12 +33,19 @@ Depois de executar o script, abra o arquivo .env para configurar as credenciais 
 
 Agora, inicie os contêineres do PostgreSQL e do RabbitMQ. Eles serão executados em segundo plano.
 
+rodar em production
 ```sh
 
 docker-compose up -d
 
 ```
 
+rodar em development
+```sh
+
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+```
 Em seguida, exporte a variável de ambiente DATABASE_URL no seu terminal e rode as migrações do banco de dados. Isso irá criar as tabelas necessárias para a aplicação.
 
 ```sh

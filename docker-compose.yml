@@ -4,8 +4,8 @@ services:
     image: "rabbitmq:3-management"
     container_name: "rabbitMQ"
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_UI_PORT}:15672"
     env_file:
       - .env
     volumes:
@@ -15,7 +15,7 @@ services:
     image: "postgres:15"
     container_name: "postgres"
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     env_file:
       - .env
     volumes:
@@ -29,9 +29,22 @@ services:
     depends_on:
       - rabbitMQ
       - postgres
+      - go-api
     env_file:
       - .env
       
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    container_name: go-api
+    depends_on:
+      - rabbitMQ
+      - postgres
+    env_file:
+      - .env
+    ports:  
+      - "${API_PORT}:8080"
 volumes:
   rabbitmq_data:
   postgres_data:

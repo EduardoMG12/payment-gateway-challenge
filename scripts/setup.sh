@@ -4,6 +4,9 @@ echo "Starting project setup..."
 
 # Copying .env.example
 cp .env.example .env
+cp .env.example.development .env.development
+cp .env.example.development .env.development
+
 
 # Installing npm dependencies
 npm install

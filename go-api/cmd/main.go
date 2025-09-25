@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"payment-gateway/go-api/internal/account"
 	"payment-gateway/go-api/internal/card"
@@ -29,15 +30,13 @@ func main() {
 	cfg := config.LoadConfig()
 
 	db, err := database.Connect(cfg.DatabaseURL)
-
 	if err != nil {
 		fmt.Printf("Database connection failed: %v\n", err)
 		log.Fatalln(err)
 	}
 	defer db.Close()
 
-	amqpURI := "amqp://guest:guest@localhost:5672/"
-	mqClient, err := utils.NewRabbitMQClient(amqpURI)
+	mqClient, err := utils.NewRabbitMQClient(cfg.AmqpURI)
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
@@ -50,8 +49,8 @@ func main() {
 	r.RegisterRoutes()
 
 	fmt.Println("Server running 🚀🚀🚀   PORT:8080")
-	fmt.Println("go-api: http://localhost:8080")
-	fmt.Printf("API Swagger doc up: http://localhost:8080/swagger/index.html")
+	fmt.Println("go-api: http://localhost:" + os.Getenv("API_PORT"))
+	fmt.Printf("API Swagger doc up: http://localhost:" + os.Getenv("API_PORT") + "/swagger/index.html\n")
 
 	log.Fatal(http.ListenAndServe(":8080", r.MuxRouter()))
 }
