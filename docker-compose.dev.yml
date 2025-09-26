@@ -11,3 +11,16 @@ services:
     env_file:
       - .env.development
      
+  rust-processor:
+    build:
+      context: ./rust-processor
+      dockerfile: Dockerfile.dev
+    container_name: rust-processor
+    volumes:
+      - ./rust-processor:/app
+    depends_on:
+      - rabbitMQ
+      - postgres
+      - go-api
+    env_file:
+      - .env.development

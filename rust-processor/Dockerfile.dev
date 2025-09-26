@@ -1,0 +1,12 @@
+FROM rustlang/rust:nightly-slim
+
+RUN cargo install cargo-watch
+
+WORKDIR /app
+
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && echo "fn main() {println!(\"building...\");}" > src/main.rs && cargo build
+
+COPY . .
+
+CMD ["cargo", "watch", "-x", "run"]
