@@ -18,6 +18,7 @@ import (
 type TransactionService interface {
 	// GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*Transaction, error)
 	CreateTransaction(ctx context.Context, tx dto.CreateTransactionRequest) (*models.Transaction, error)
+	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction)
 }
 
 type transactionServiceImpl struct {
@@ -68,7 +69,6 @@ func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.
 	if err != nil {
 		return nil, err
 	}
-
 	var cardId string
 
 	if req.CardToken != nil {
@@ -79,15 +79,26 @@ func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.
 		cardId = cardIsReturn
 	}
 
+	if req.Type == "REFUND" {
+		_, err = s.repo.GetTransactionByID(ctx, *req.RefundTransactionId)
+		if err != nil {
+			return nil, fmt.Errorf("original transaction for refund not found: %w", err)
+		}
+	}
+
 	transaction := &models.Transaction{
-		AccountId:      account.ID,
-		CardId:         sql.NullString{String: "", Valid: false},
-		AmountCents:    req.AmountCents,
-		Type:           req.Type,
-		IdempotencyKey: idempotencyKey,
+		AccountId:           account.ID,
+		CardId:              sql.NullString{String: "", Valid: false},
+		RefundTransactionId: sql.NullString{String: "", Valid: false},
+		AmountCents:         req.AmountCents,
+		Type:                req.Type,
+		IdempotencyKey:      idempotencyKey,
 	}
 	if cardId != "" {
 		transaction.CardId = sql.NullString{String: cardId, Valid: true}
+	}
+	if req.RefundTransactionId != nil {
+		transaction.RefundTransactionId = sql.NullString{String: *req.RefundTransactionId, Valid: true}
 	}
 
 	if err := s.repo.CreateTransaction(ctx, transaction); err != nil {
@@ -108,4 +119,15 @@ func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.
 	}
 
 	return transaction, nil
+}
+
+func (s *transactionServiceImpl) GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction) {
+	err, transactions := s.repo.GetAllTransactionsByAccountIdTest(ctx, accountId)
+	if err != nil {
+		return err, nil
+	}
+	if len(transactions) > 0 {
+		return nil, transactions
+	}
+	return nil, transactions
 }

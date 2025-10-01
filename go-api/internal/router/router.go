@@ -40,4 +40,6 @@ func (r *Router) RegisterRoutes() {
 	r.muxRouter.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	r.muxRouter.HandleFunc("/transactions", r.TransactionHandler.CreateTransaction).Methods("POST")
+	r.muxRouter.HandleFunc("/transactions/{accountId}", r.TransactionHandler.GetAllTransactionByAccountIdTestOrderDate).Methods("GET")
+
 }

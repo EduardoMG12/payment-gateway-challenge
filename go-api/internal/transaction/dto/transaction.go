@@ -9,6 +9,10 @@ type CreateTransactionRequest struct {
 	// @Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
 	CardToken *string `json:"card_token,omitempty" validate:"omitempty,min=20,max=126"`
 
+	// @Description The ID of the transaction being refunded (required for REFUND transactions).
+	// @Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
+	RefundTransactionId *string `json:"refund_transaction_id,omitempty" validate:"omitempty,uuid4"`
+
 	// @Description The transaction amount in cents. Must be a positive integer.
 	// @Example 10000
 	AmountCents int64 `json:"amount_cents" validate:"required,gt=0"`

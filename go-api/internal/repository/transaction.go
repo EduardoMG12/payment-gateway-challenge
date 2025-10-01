@@ -15,6 +15,7 @@ type TransactionRepository interface {
 	BeginTx(ctx context.Context) (*sql.Tx, error)
 	GetTransactionByID(ctx context.Context, txID string) (*models.Transaction, error)
 	FindMostRecentTransaction(ctx context.Context, accountID, txType string, amountCents int64) (*models.Transaction, error)
+	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction)
 }
 
 type transactionRepositoryImpl struct {
@@ -95,4 +96,19 @@ func (r *transactionRepositoryImpl) FindMostRecentTransaction(ctx context.Contex
 	}
 
 	return &tx, nil
+}
+
+func (r *transactionRepositoryImpl) GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction) {
+	query := `SELECT * FROM transactions WHERE account_id = $1 ORDER BY created_at DESC`
+	var transactions []*models.Transaction
+
+	err := r.db.SelectContext(ctx, &transactions, query, accountId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return fmt.Errorf("failed to get transactions by account id: %w", err), nil
+	}
+
+	return nil, transactions
 }

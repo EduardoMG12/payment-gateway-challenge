@@ -9,6 +9,7 @@ import (
 	"payment-gateway/go-api/internal/transaction/dto"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 type TransactionHandler struct {
@@ -34,7 +35,6 @@ func NewTransactionHandler(service TransactionService) *TransactionHandler {
 // @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	lang := i18n.GetLangFromHeader(r)
-
 	var req dto.CreateTransactionRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -69,3 +69,22 @@ func (h *TransactionHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 // @Failure 500 {object} api.APIError "Internal server error"
 // @Router /transactions/{accountId} [get]
 func (h *TransactionHandler) GetTransactionByAccountId(w http.ResponseWriter, r *http.Request) {}
+
+func (h *TransactionHandler) GetAllTransactionByAccountIdTestOrderDate(w http.ResponseWriter, r *http.Request) {
+	lang := i18n.GetLangFromHeader(r)
+
+	vars := mux.Vars(r)
+	accountId := vars["accountId"]
+
+	err, transactions := h.service.GetAllTransactionsByAccountIdTest(r.Context(), accountId)
+	fmt.Print("teste")
+	if err != nil {
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorCreatingTransaction))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(transactions)
+
+}
