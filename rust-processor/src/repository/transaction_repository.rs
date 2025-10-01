@@ -1,7 +1,15 @@
-use crate::models::TransactionStatus;
+use crate::models::{DbTransaction, TransactionStatus};
 use anyhow::Result;
 use sqlx::PgPool;
 use uuid::Uuid;
+
+use async_trait::async_trait;
+
+#[async_trait]
+pub trait TTransactionRepository {
+    async fn find_by_id(&self, tx_id: Uuid) -> Result<Option<DbTransaction>>;
+    async fn update_status(&self, tx_id: Uuid, status: TransactionStatus) -> Result<()>;
+}
 
 pub struct TransactionRepository<'a> {
     pool: &'a PgPool,
@@ -11,8 +19,11 @@ impl<'a> TransactionRepository<'a> {
     pub fn new(pool: &'a PgPool) -> Self {
         Self { pool }
     }
+}
 
-    pub async fn update_status(&self, tx_id: Uuid, status: TransactionStatus) -> Result<()> {
+#[async_trait]
+impl TTransactionRepository for TransactionRepository<'_> {
+    async fn update_status(&self, tx_id: Uuid, status: TransactionStatus) -> Result<()> {
         sqlx::query(
             r#"
             UPDATE transactions
@@ -26,5 +37,20 @@ impl<'a> TransactionRepository<'a> {
         .await?;
 
         Ok(())
+    }
+
+    async fn find_by_id(&self, tx_id: Uuid) -> Result<Option<DbTransaction>> {
+        let maybe_transaction = sqlx::query_as::<_, DbTransaction>(
+            r#"
+            SELECT id, account_id, amount_cents, "type", refund_transaction_id, status, created_at
+            FROM transactions
+            WHERE id = $1
+            "#,
+        )
+        .bind(tx_id)
+        .fetch_optional(self.pool)
+        .await?;
+
+        Ok(maybe_transaction)
     }
 }

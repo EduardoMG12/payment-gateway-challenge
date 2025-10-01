@@ -2,9 +2,7 @@ use anyhow::Result;
 use sqlx::PgPool;
 
 use crate::models::{QueueTransaction, TransactionStatus, TransactionType};
-use crate::repository::{
-    account_reposistory::AccountRepository, transaction_repository::TransactionRepository,
-};
+use crate::repository::{AccountRepository, TTransactionRepository, TransactionRepository};
 use crate::services;
 
 pub async fn process_transaction(pool: &PgPool, tx: QueueTransaction) -> Result<()> {
@@ -26,7 +24,7 @@ pub async fn process_transaction(pool: &PgPool, tx: QueueTransaction) -> Result<
     if tx.amount_cents <= 0 {
         transaction_repo
             .update_status(tx.id, TransactionStatus::REJECTED)
-            .await?;
+            .await?
     }
 
     match tx
@@ -35,7 +33,8 @@ pub async fn process_transaction(pool: &PgPool, tx: QueueTransaction) -> Result<
         .map_err(anyhow::Error::msg)?
     {
         TransactionType::DEPOSIT => {
-            services::deposit_service::process_deposit(tx);
+            services::deposit_service::process_deposit(&transaction_repo, &account_repo, tx)
+                .await?;
             return Ok(());
         }
         TransactionType::PURCHASE => {
@@ -58,8 +57,8 @@ pub async fn process_transaction(pool: &PgPool, tx: QueueTransaction) -> Result<
     // thinking about my code is clean and easy to understand, my imporsts are organized
     // thinking about how can i make a documentation for my rust code
 
-    let balance = account_repo.get_balance(tx.account_id).await?;
-    println!("Novo saldo da conta {}: {}", tx.account_id, balance);
+    // let balance = account_repo.get_balance(tx.account_id).await?;
+    // println!("Novo saldo da conta {}: {}", tx.account_id, balance);
 
     Ok(())
 }

@@ -1,11 +1,13 @@
-// use uuid::Uuid;
-// use sqlx::FromRow;
-// use chrono::{DateTime, Utc};
+use chrono::DateTime;
+use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
+use sqlx::FromRow;
 use std::str::FromStr;
+use uuid::Uuid;
 
-#[derive(Debug, Clone, Copy, Deserialize)]
+#[derive(Debug, sqlx::Type, PartialEq)]
+#[sqlx(type_name = "VARCHAR")]
 pub enum TransactionStatus {
     PENDING,
     APPROVED,
@@ -14,16 +16,6 @@ pub enum TransactionStatus {
 }
 
 impl TransactionStatus {
-    // pub fn from_str(s: &str) -> Option<Self> {
-    //     match s {
-    //         "PENDING" => Some(TransactionStatus::PENDING),
-    //         "APPROVED" => Some(TransactionStatus::APPROVED),
-    //         "REJECTED" => Some(TransactionStatus::REJECTED),
-    //         "ERROR" => Some(TransactionStatus::ERROR),
-    //         _ => None,
-    //     }
-    // }
-
     pub fn as_str(&self) -> &str {
         match self {
             TransactionStatus::PENDING => "PENDING",
@@ -54,21 +46,14 @@ impl FromStr for TransactionType {
     }
 }
 
-// #[derive(Debug, FromRow)]
-// pub struct DbTransaction {
-//     pub id: Uuid,
-//     pub account_id: Uuid,
-//     pub card_id: Option<Uuid>,
-
-//     pub amount_cents: i64,
-//     #[sqlx(rename = "type")]
-//     pub transaction_type: String,
-//     pub idempotency_key: String,
-//     pub created_at: DateTime<Utc>,
-// }
-
-// #[derive(Debug, FromRow)]
-// pub struct Account {
-//     pub id: Uuid,
-//     pub balance_cents: i64,
-// }
+#[derive(Debug, FromRow)]
+pub struct DbTransaction {
+    pub id: Uuid,
+    pub account_id: Uuid,
+    pub amount_cents: i64,
+    #[sqlx(rename = "type")]
+    pub transaction_type: String,
+    pub refund_transaction_id: Option<Uuid>,
+    pub status: TransactionStatus,
+    pub created_at: DateTime<Utc>,
+}
