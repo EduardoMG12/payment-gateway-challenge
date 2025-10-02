@@ -57,3 +57,8 @@ pub struct DbTransaction {
     pub status: TransactionStatus,
     pub created_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct BalanceRequest {
+    pub account_id: Uuid,
+}

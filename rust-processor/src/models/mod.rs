@@ -4,6 +4,7 @@ pub mod transaction;
 
 pub use queue_model::QueueTransaction;
 
+pub use transaction::BalanceRequest;
 pub use transaction::DbTransaction;
 pub use transaction::TransactionStatus;
 pub use transaction::TransactionType;
