@@ -9,6 +9,7 @@ use async_trait::async_trait;
 pub trait TTransactionRepository {
     async fn find_by_id(&self, tx_id: Uuid) -> Result<Option<DbTransaction>>;
     async fn update_status(&self, tx_id: Uuid, status: TransactionStatus) -> Result<()>;
+    async fn get_balance(&self, account_id: Uuid) -> Result<i64>;
 }
 
 pub struct TransactionRepository<'a> {
@@ -52,5 +53,38 @@ impl TTransactionRepository for TransactionRepository<'_> {
         .await?;
 
         Ok(maybe_transaction)
+    }
+
+    async fn get_balance(&self, account_id: Uuid) -> Result<i64> {
+        let row: (Option<i64>,) = sqlx::query_as(
+            r#"
+            SELECT
+                SUM(
+                    CASE
+                        WHEN t1.type = 'DEPOSIT' THEN t1.amount_cents
+                        WHEN t1.type = 'PURCHASE' THEN -t1.amount_cents
+                        WHEN t1.type = 'REFUND' THEN
+                            CASE t_orig.type
+                                WHEN 'DEPOSIT' THEN -t1.amount_cents
+                                WHEN 'PURCHASE' THEN t1.amount_cents
+                                ELSE 0
+                            END
+                        ELSE 0
+                    END
+                )::BIGINT
+            FROM
+                transactions AS t1
+            LEFT JOIN
+                transactions AS t_orig ON t1.refund_transaction_id = t_orig.id
+            WHERE
+                t1.account_id = $1
+            AND
+                t1.status = 'APPROVED'
+            "#,
+        )
+        .bind(account_id)
+        .fetch_one(self.pool)
+        .await?;
+        Ok(row.0.unwrap_or(0))
     }
 }

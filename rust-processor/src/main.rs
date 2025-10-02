@@ -1,14 +1,16 @@
 mod config;
-mod db;
+mod connections;
 mod models;
-mod processor;
-mod rabbitmq;
+mod processors;
 mod repository;
 mod services;
 
 use std::sync::Arc;
 
-use crate::models::{BalanceRequest, QueueTransaction};
+use crate::{
+    models::{BalanceRequest, QueueTransaction},
+    processors::{processor_balance, processor_transaction},
+};
 
 use anyhow::Result;
 
@@ -17,21 +19,23 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     let config = config::Config::load()?;
 
-    let pool = db::setup_sqlx_pool(&config.database_url()).await?;
+    let pool = connections::db::setup_sqlx_pool(&config.database_url()).await?;
 
     let amqp_addr = config.rabbitmq_amqp_addr();
-    let channel = rabbitmq::create_channel(&amqp_addr).await?;
+    let channel = connections::rabbitmq::create_channel(&amqp_addr).await?;
 
     let pool = Arc::new(pool);
 
-    rabbitmq::consume_queue(channel, "transactions_queue", {
+    connections::rabbitmq::consume_queue(channel, "transactions_queue", {
         let pool = Arc::clone(&pool);
         move |msg: String| {
             let pool = Arc::clone(&pool);
             async move {
                 match serde_json::from_str::<QueueTransaction>(&msg) {
                     Ok(tx) => {
-                        if let Err(err) = processor::process_transaction(&pool, tx).await {
+                        if let Err(err) =
+                            processor_transaction::process_transaction(&pool, tx).await
+                        {
                             eprintln!("❌ Error processing transaction: {:?}", err);
                         }
                     }
@@ -42,7 +46,7 @@ async fn main() -> Result<()> {
     })
     .await?;
 
-    let channel_balance = rabbitmq::create_channel(&amqp_addr).await?;
+    let channel_balance = connections::rabbitmq::create_channel(&amqp_addr).await?;
     let pool_balance = Arc::clone(&pool);
     tokio::spawn(async move {
         let handler = move |msg: String| {
@@ -51,7 +55,7 @@ async fn main() -> Result<()> {
                 match serde_json::from_str::<BalanceRequest>(&msg) {
                     Ok(req) => {
                         if let Err(err) =
-                            services::process_balance::process_balance_request(&pool, req).await
+                            processor_balance::process_balance_request(&pool, req).await
                         {
                             eprintln!("❌ Error to process balance: {:?}", err);
                         }
@@ -60,8 +64,12 @@ async fn main() -> Result<()> {
                 }
             }
         };
-        if let Err(e) =
-            rabbitmq::consume_queue(channel_balance, "calculate_balance_queue", handler).await
+        if let Err(e) = connections::rabbitmq::consume_queue(
+            channel_balance,
+            "calculate_balance_queue",
+            handler,
+        )
+        .await
         {
             eprintln!("Error in balance consumer: {}", e);
         }
