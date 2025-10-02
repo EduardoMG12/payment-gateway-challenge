@@ -7,29 +7,32 @@ import (
 	"fmt"
 	"payment-gateway/go-api/internal/account"
 	"payment-gateway/go-api/internal/card"
+	"payment-gateway/go-api/internal/connection"
 
 	"payment-gateway/go-api/internal/models"
 	"payment-gateway/go-api/internal/repository"
 	"payment-gateway/go-api/internal/transaction/dto"
-	"payment-gateway/go-api/internal/utils"
 	"time"
 )
 
 type TransactionService interface {
 	// GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*Transaction, error)
 	CreateTransaction(ctx context.Context, tx dto.CreateTransactionRequest) (*models.Transaction, error)
-	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction)
+	GetBalanceByAccountId(ctx context.Context, accountId string) error
+	GetBalanceFromCache(ctx context.Context, key string) (string, error)
+	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) ([]*models.Transaction, error)
 }
 
 type transactionServiceImpl struct {
 	repo           repository.TransactionRepository
 	accountService account.AccountService
 	cardService    card.CardService
-	mqClient       utils.RabbitMQClient
+	mqClient       connection.RabbitMQClient
+	redis          connection.RedisConnection
 }
 
-func NewTransactionService(repo repository.TransactionRepository, service account.AccountService, mqClient utils.RabbitMQClient, cardService card.CardService) *transactionServiceImpl {
-	return &transactionServiceImpl{repo: repo, accountService: service, mqClient: mqClient, cardService: cardService}
+func NewTransactionService(repo repository.TransactionRepository, service account.AccountService, mqClient connection.RabbitMQClient, cardService card.CardService, redis connection.RedisConnection) *transactionServiceImpl {
+	return &transactionServiceImpl{repo: repo, accountService: service, mqClient: mqClient, cardService: cardService, redis: redis}
 }
 
 // func (s *transactionServiceImpl) GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*Transaction, error) {
@@ -97,7 +100,7 @@ func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.
 	if cardId != "" {
 		transaction.CardId = sql.NullString{String: cardId, Valid: true}
 	}
-	if req.RefundTransactionId != nil {
+	if req.RefundTransactionId != nil && req.Type == "REFUND" {
 		transaction.RefundTransactionId = sql.NullString{String: *req.RefundTransactionId, Valid: true}
 	}
 
@@ -121,13 +124,28 @@ func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.
 	return transaction, nil
 }
 
-func (s *transactionServiceImpl) GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction) {
+func (s *transactionServiceImpl) GetBalanceFromCache(ctx context.Context, key string) (string, error) {
+	return s.redis.Client.Get(ctx, key).Result()
+}
+
+func (s *transactionServiceImpl) GetBalanceByAccountId(ctx context.Context, accountId string) error {
+	message := map[string]string{"account_id": accountId}
+
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		return fmt.Errorf("failed to serialize message for queue: %w", err)
+	}
+
+	return s.mqClient.Publish(ctx, "calculate_balance_queue", messageBytes)
+}
+
+func (s *transactionServiceImpl) GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) ([]*models.Transaction, error) {
 	err, transactions := s.repo.GetAllTransactionsByAccountIdTest(ctx, accountId)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	if len(transactions) > 0 {
-		return nil, transactions
+		return transactions, nil
 	}
-	return nil, transactions
+	return transactions, nil
 }

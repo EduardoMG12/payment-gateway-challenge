@@ -39,3 +39,18 @@ type ResponseCreateTransactionRequest struct {
 	// @Example PURCHASE
 	Type string `json:"type" validate:"required,oneof=DEPOSIT PURCHASE REFUND CHARGE"`
 }
+
+type ResponseAccountBalance struct {
+	// @Description The unique identifier of the account.
+	// @Example 550e8400-e29b-41d4-a716-446655440000
+	Id string `json:"id" db:"id"`
+
+	// @Description The all sum of transactions amount in cents. Must be a positive integer.
+	// @Example 10000
+	Balance int64 `json:"balance_cents"`
+}
+type RequestGetAccountAndBalance struct {
+	// @Description The unique identifier of the account.
+	// @Example 550e8400-e29b-41d4-a716-446655440000
+	Id string `json:"id" db:"id"`
+}
