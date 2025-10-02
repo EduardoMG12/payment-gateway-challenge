@@ -8,6 +8,7 @@ import (
 type Config struct {
 	DatabaseURL string
 	AmqpURI     string
+	RedisURI    string
 }
 
 func LoadConfig() *Config {
@@ -16,11 +17,13 @@ func LoadConfig() *Config {
 
 	fmt.Println("Running in " + env + " mode")
 
-	dbURL := db_connection().DatabaseURL
-	amqpURI := rabbitmq_connection().AmqpURI
+	dbURL := dbUrl().DatabaseURL
+	amqpURI := rabbitMQURI().AmqpURI
+	redisURI := redisUri().RedisURI
 
 	return &Config{
 		DatabaseURL: dbURL,
 		AmqpURI:     amqpURI,
+		RedisURI:    redisURI,
 	}
 }

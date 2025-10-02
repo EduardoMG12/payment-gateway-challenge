@@ -1,4 +1,4 @@
-package database
+package connection
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(databaseUrl string) (*sqlx.DB, error) {
+func ConnectDatabase(databaseUrl string) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("postgres", databaseUrl)
 	if err != nil {
 		return nil, fmt.Errorf("database connection failed: %w", err)

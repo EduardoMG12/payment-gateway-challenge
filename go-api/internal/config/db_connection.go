@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-type DbConnection struct {
+type DbUrl struct {
 	DatabaseURL string
 }
 
-func db_connection() *DbConnection {
+func dbUrl() *DbUrl {
 
 	dbUser := os.Getenv("POSTGRES_USER")
 	dbPassword := os.Getenv("POSTGRES_PASSWORD")
@@ -21,7 +21,7 @@ func db_connection() *DbConnection {
 		log.Fatal("DATABASE_URL is not configured.")
 	}
 
-	return &DbConnection{
+	return &DbUrl{
 		DatabaseURL: dbURL,
 	}
 

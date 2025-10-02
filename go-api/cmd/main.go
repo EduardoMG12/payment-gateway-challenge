@@ -9,10 +9,9 @@ import (
 	"payment-gateway/go-api/internal/account"
 	"payment-gateway/go-api/internal/card"
 	"payment-gateway/go-api/internal/config"
-	"payment-gateway/go-api/internal/database"
+	"payment-gateway/go-api/internal/connection"
 	"payment-gateway/go-api/internal/router"
 	"payment-gateway/go-api/internal/transaction"
-	"payment-gateway/go-api/internal/utils"
 
 	_ "payment-gateway/go-api/docs"
 
@@ -29,21 +28,26 @@ func main() {
 
 	cfg := config.LoadConfig()
 
-	db, err := database.Connect(cfg.DatabaseURL)
+	db, err := connection.ConnectDatabase(cfg.DatabaseURL)
 	if err != nil {
 		fmt.Printf("Database connection failed: %v\n", err)
 		log.Fatalln(err)
 	}
 	defer db.Close()
 
-	mqClient, err := utils.NewRabbitMQClient(cfg.AmqpURI)
+	mqClient, err := connection.NewRabbitMQClient(cfg.AmqpURI)
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
 
+	redisConn, err := connection.ConnectRedis(cfg.RedisURI)
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+
 	accountModule := account.NewModule(db)
 	cardModule := *card.NewModule(db, accountModule.Service)
-	transactionModule := transaction.NewModule(db, accountModule.Service, mqClient, cardModule.Service)
+	transactionModule := transaction.NewModule(db, accountModule.Service, mqClient, cardModule.Service, *redisConn)
 
 	r := router.NewRouter(accountModule.Handler, cardModule.Handler, transactionModule.Handler)
 	r.RegisterRoutes()

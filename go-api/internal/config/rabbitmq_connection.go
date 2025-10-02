@@ -6,11 +6,11 @@ import (
 	"os"
 )
 
-type RabbitMQConnection struct {
+type RabbitMQURI struct {
 	AmqpURI string
 }
 
-func rabbitmq_connection() *RabbitMQConnection {
+func rabbitMQURI() *RabbitMQURI {
 
 	rabbitMQDefaultUser := os.Getenv("RABBITMQ_DEFAULT_USER")
 	rabbitMQDefaultPass := os.Getenv("RABBITMQ_DEFAULT_PASS")
@@ -24,7 +24,7 @@ func rabbitmq_connection() *RabbitMQConnection {
 	}
 	fmt.Print(amqpURI)
 
-	return &RabbitMQConnection{
+	return &RabbitMQURI{
 		AmqpURI: amqpURI,
 	}
 
