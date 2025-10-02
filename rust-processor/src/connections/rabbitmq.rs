@@ -5,16 +5,22 @@ use lapin::{
     options::{BasicAckOptions, BasicConsumeOptions, QueueDeclareOptions},
     types::FieldTable,
 };
-use std::future::Future;
+use std::{future::Future, sync::Arc};
 
-pub async fn create_channel(amqp_addr: &str) -> Result<Channel> {
-    let conn = Connection::connect(amqp_addr, ConnectionProperties::default()).await?;
-    println!("✅ Conected to RabbitMQ!");
+pub async fn create_connection(addr: &str) -> Result<Connection> {
+    let conn = Connection::connect(addr, ConnectionProperties::default()).await?;
+    Ok(conn)
+}
+
+pub async fn create_channel(conn: &Connection) -> Result<Channel> {
     let channel = conn.create_channel().await?;
     Ok(channel)
 }
-
-pub async fn consume_queue<F, Fut>(channel: Channel, queue_name: &str, handler: F) -> Result<()>
+pub async fn consume_queue<F, Fut>(
+    channel: Arc<Channel>,
+    queue_name: &str,
+    handler: F,
+) -> Result<()>
 where
     F: Fn(String) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
@@ -64,27 +70,3 @@ where
 
     Ok(())
 }
-
-// Commented out because not used in this project now, fot don't show warning logs but can be useful for future implementations
-// pub async fn publish<T: serde::Serialize>(
-//     channel: &Channel, // Recebe uma referência ao canal existente
-//     queue_name: &str,
-//     message: T
-// ) -> Result<()> {
-//     let payload = serde_json::to_vec(&message)?;
-
-//     channel
-//         .basic_publish(
-//             "",
-//             queue_name,
-//             lapin::options::BasicPublishOptions::default(),
-//             &payload,
-//             lapin::BasicProperties::default().with_delivery_mode(2.into()),
-//         )
-//         .await?
-//         .await?;
-
-//     println!("✅ Published to {}: {:?}", queue_name, message.serialize(serde_json::value::Serializer).unwrap());
-
-//     Ok(())
-// }
