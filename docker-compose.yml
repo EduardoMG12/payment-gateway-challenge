@@ -29,6 +29,7 @@ services:
     depends_on:
       - rabbitMQ
       - postgres
+      - redis
       - go-api
     env_file:
       - .env
@@ -41,10 +42,22 @@ services:
     depends_on:
       - rabbitMQ
       - postgres
+      - redis
     env_file:
       - .env
     ports:  
       - "${API_PORT}:8080"
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
 volumes:
   rabbitmq_data:
   postgres_data:
+  redis_data:
