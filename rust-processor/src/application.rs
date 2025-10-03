@@ -56,15 +56,20 @@ impl Application {
     fn run_transaction_consumer(&self) -> JoinHandle<()> {
         let pool = Arc::clone(&self.db_pool);
         let channel = Arc::clone(&self.transaction_channel);
-
+        let cache_repo = Arc::clone(&self.cache_repo);
         tokio::spawn(async move {
             let handler = move |msg: String| {
                 let pool = Arc::clone(&pool);
+                let cache_repo_clone = Arc::clone(&cache_repo);
                 async move {
                     match serde_json::from_str::<QueueTransaction>(&msg) {
                         Ok(tx) => {
-                            if let Err(err) =
-                                processor_transaction::process_transaction(&pool, tx).await
+                            if let Err(err) = processor_transaction::process_transaction(
+                                &pool,
+                                &cache_repo_clone,
+                                tx,
+                            )
+                            .await
                             {
                                 eprintln!("❌ Error processing transaction: {:?}", err);
                             }
