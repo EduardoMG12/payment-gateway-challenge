@@ -13,6 +13,12 @@ pub struct Config {
     pub postgres_db: String,
     pub postgres_host: String,
     pub postgres_port: String,
+
+    pub redis_host: String,
+    pub redis_port: String,
+
+    pub writer_redis_user: String,
+    pub writer_redis_password: String,
 }
 
 impl Config {
@@ -43,6 +49,13 @@ impl Config {
             self.postgres_host,
             self.postgres_port,
             self.postgres_db
+        )
+    }
+
+    pub fn redis_url(&self) -> String {
+        format!(
+            "redis://{}:{}@{}:{}/",
+            self.writer_redis_user, self.writer_redis_password, self.redis_host, self.redis_port
         )
     }
 }

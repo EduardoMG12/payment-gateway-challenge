@@ -1,8 +1,9 @@
 use crate::{
     config::Config,
-    connections,
+    connections::{self, CacheRepository},
     models::{BalanceRequest, QueueTransaction},
     processors::{processor_balance, processor_transaction},
+    repository::{AccountRepository, TransactionRepository},
 };
 use anyhow::Result;
 use lapin::Channel;
@@ -11,6 +12,7 @@ use std::sync::Arc;
 use tokio::task::JoinHandle;
 pub struct Application {
     db_pool: Arc<PgPool>,
+    cache_repo: Arc<CacheRepository>,
     transaction_channel: Arc<Channel>,
     balance_channel: Arc<Channel>,
 }
@@ -18,6 +20,8 @@ pub struct Application {
 impl Application {
     pub async fn build(config: &Config) -> Result<Self> {
         let db_pool = Arc::new(connections::db::setup_sqlx_pool(&config.database_url()).await?);
+
+        let cache_repo = Arc::new(connections::CacheRepository::new(&config.redis_url())?);
 
         let amqp_conn =
             connections::rabbitmq::create_connection(&config.rabbitmq_amqp_addr()).await?;
@@ -30,6 +34,7 @@ impl Application {
 
         Ok(Self {
             db_pool,
+            cache_repo,
             transaction_channel,
             balance_channel,
         })
@@ -82,15 +87,22 @@ impl Application {
     fn run_balance_consumer(&self) -> JoinHandle<()> {
         let pool = Arc::clone(&self.db_pool);
         let channel = Arc::clone(&self.balance_channel);
+        let cache_repo = Arc::clone(&self.cache_repo);
 
         tokio::spawn(async move {
             let handler = move |msg: String| {
                 let pool = Arc::clone(&pool);
+                let cache_repo_clone = Arc::clone(&cache_repo);
                 async move {
                     match serde_json::from_str::<BalanceRequest>(&msg) {
                         Ok(req) => {
-                            if let Err(err) =
-                                processor_balance::process_balance_request(&pool, req).await
+                            let transaction_repo = TransactionRepository::new(&pool);
+                            if let Err(err) = processor_balance::process_balance_request(
+                                &transaction_repo,
+                                &cache_repo_clone,
+                                req,
+                            )
+                            .await
                             {
                                 eprintln!("❌ Error processing balance request: {:?}", err);
                             }
