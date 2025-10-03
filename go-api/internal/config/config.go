@@ -17,9 +17,9 @@ func LoadConfig() *Config {
 
 	fmt.Println("Running in " + env + " mode")
 
-	dbURL := dbUrl().DatabaseURL
-	amqpURI := rabbitMQURI().AmqpURI
-	redisURI := redisUri().RedisURI
+	dbURL := dbUrlParser().DatabaseURL
+	amqpURI := rabbitMQURIParser().AmqpURI
+	redisURI := redisUriParser().RedisURI
 
 	return &Config{
 		DatabaseURL: dbURL,

@@ -13,10 +13,12 @@ type RedisConnection struct {
 }
 
 func ConnectRedis(redisAddr string) (*RedisConnection, error) {
-	redisPassword := os.Getenv("REDIS_PASSWORD")
+	redisUser := os.Getenv("READER_REDIS_USER")
+	redisPassword := os.Getenv("READER_REDIS_PASSWORD")
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
+		Username: redisUser,
 		Password: redisPassword,
 		DB:       0,
 	})
@@ -24,10 +26,10 @@ func ConnectRedis(redisAddr string) (*RedisConnection, error) {
 	ctx := context.Background()
 	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		return nil, fmt.Errorf("falha ao conectar com o Redis: %w", err)
+		return nil, fmt.Errorf("fail to connect to Redis: %w", err)
 	}
 
-	fmt.Println("✅ Conectado ao Redis! PORT: localhost:6379")
+	fmt.Println("✅ Connected to Redis! PORT: localhost:6379")
 
 	return &RedisConnection{
 		Client: rdb,

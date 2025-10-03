@@ -9,7 +9,7 @@ type DbUrl struct {
 	DatabaseURL string
 }
 
-func dbUrl() *DbUrl {
+func dbUrlParser() *DbUrl {
 
 	dbUser := os.Getenv("POSTGRES_USER")
 	dbPassword := os.Getenv("POSTGRES_PASSWORD")

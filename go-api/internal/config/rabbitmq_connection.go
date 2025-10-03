@@ -10,7 +10,7 @@ type RabbitMQURI struct {
 	AmqpURI string
 }
 
-func rabbitMQURI() *RabbitMQURI {
+func rabbitMQURIParser() *RabbitMQURI {
 
 	rabbitMQDefaultUser := os.Getenv("RABBITMQ_DEFAULT_USER")
 	rabbitMQDefaultPass := os.Getenv("RABBITMQ_DEFAULT_PASS")
