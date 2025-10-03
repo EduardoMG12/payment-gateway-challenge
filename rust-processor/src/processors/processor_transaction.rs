@@ -19,10 +19,7 @@ pub async fn process_transaction(
     println!("  Account ID: {}", tx.account_id);
     println!("  Amount (cents): {}", tx.amount_cents);
     println!("  Type: {}", tx.transaction_type);
-    println!(
-        "  Refund Transaction ID: {}",
-        tx.refund_transaction_id.value
-    );
+    println!("  Refund Transaction ID: {:?}", tx.refund_transaction_id);
     println!("  Status: {}", tx.status);
     println!("}}");
 
@@ -50,7 +47,8 @@ pub async fn process_transaction(
             .await?;
         }
         Ok(TransactionType::REFUND) => {
-            services::refund_service::process_refund(tx.clone());
+            services::refund_service::process_refund(&transaction_repo, &account_repo, tx.clone())
+                .await?;
         }
         Err(e) => {
             transaction_repo
@@ -65,6 +63,7 @@ pub async fn process_transaction(
     };
 
     crate::processors::processor_balance::process_balance_request(
+        &account_repo,
         &transaction_repo,
         &cache_repository,
         balance_request,

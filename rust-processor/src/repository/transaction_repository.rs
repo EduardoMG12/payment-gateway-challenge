@@ -9,7 +9,14 @@ use async_trait::async_trait;
 pub trait TTransactionRepository {
     async fn find_by_id(&self, tx_id: Uuid) -> Result<Option<DbTransaction>>;
     async fn update_status(&self, tx_id: Uuid, status: TransactionStatus) -> Result<()>;
+    async fn update_refund_transaction_id(
+        &self,
+        tx_id: Uuid,
+        refund_tx_id: Uuid,
+        status: TransactionStatus,
+    ) -> Result<()>;
     async fn get_balance(&self, account_id: Uuid) -> Result<i64>;
+    async fn has_been_refunded(&self, original_tx_id: Uuid) -> Result<bool>;
 }
 
 pub struct TransactionRepository<'a> {
@@ -32,6 +39,44 @@ impl TTransactionRepository for TransactionRepository<'_> {
             WHERE id = $2
             "#,
         )
+        .bind(status.as_str())
+        .bind(tx_id)
+        .execute(self.pool)
+        .await?;
+
+        Ok(())
+    }
+
+    async fn has_been_refunded(&self, original_tx_id: Uuid) -> Result<bool> {
+        let exists: (bool,) = sqlx::query_as(
+            r#"
+            SELECT EXISTS (
+                SELECT 1 FROM transactions
+                WHERE refund_transaction_id = $1 AND status = 'APPROVED'
+            )
+            "#,
+        )
+        .bind(original_tx_id)
+        .fetch_one(self.pool)
+        .await?;
+
+        Ok(exists.0)
+    }
+
+    async fn update_refund_transaction_id(
+        &self,
+        tx_id: Uuid,
+        refund_tx_id: Uuid,
+        status: TransactionStatus,
+    ) -> Result<()> {
+        sqlx::query(
+            r#"
+            UPDATE transactions
+            SET refund_transaction_id  = $1, status = $2, amount_cents = (SELECT amount_cents FROM transactions WHERE id = $1)
+            WHERE id = $3
+            "#,
+        )
+        .bind(refund_tx_id)
         .bind(status.as_str())
         .bind(tx_id)
         .execute(self.pool)

@@ -102,7 +102,9 @@ impl Application {
                     match serde_json::from_str::<BalanceRequest>(&msg) {
                         Ok(req) => {
                             let transaction_repo = TransactionRepository::new(&pool);
+                            let account_repo = AccountRepository::new(&pool);
                             if let Err(err) = processor_balance::process_balance_request(
+                                &account_repo,
                                 &transaction_repo,
                                 &cache_repo_clone,
                                 req,

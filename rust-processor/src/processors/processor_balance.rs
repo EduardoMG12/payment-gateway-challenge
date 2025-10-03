@@ -1,13 +1,19 @@
 use crate::connections::CacheRepository;
 use crate::models::BalanceRequest;
-use crate::repository::{TTransactionRepository, account_repository};
+use crate::repository::{TAccountRepository, TTransactionRepository};
 use anyhow::Result;
 
 pub async fn process_balance_request(
+    account_repository: &impl TAccountRepository,
     transaction_repository: &impl TTransactionRepository,
     cache_repository: &CacheRepository,
     req: BalanceRequest,
 ) -> Result<()> {
+    let account = account_repository.find_by_id(req.account_id).await?;
+    if account.is_none() {
+        return Ok(());
+    }
+
     println!(
         "📥 Balance calculation request received for account: {}",
         req.account_id
