@@ -23,14 +23,16 @@ func NewCardHandler(service CardService) *CardHandler {
 	}
 }
 
+// @ID create-card
 // @Summary Create a new card
-// @Description Creates a new, fictional card and associates it with an account.
+// @Description Creates a fictional card and associates it with an account.
 // @Tags cards
 // @Accept json
 // @Produce json
-// @Param card body dto.CreateCardRequest true "Account ID to associate the new card"
-// @Success 201 {object} models.Card
+// @Param card body dto.CreateCardRequest true "Account ID"
+// @Success 201 {object} dto.CardResponse "Card created successfully"
 // @Failure 400 {object} api.APIError "Invalid request body or validation failed"
+// @Failure 404 {object} api.APIError "Account not found"
 // @Failure 500 {object} api.APIError "Failed to create card"
 // @Router /cards [post]
 func (h *CardHandler) CreateCard(w http.ResponseWriter, r *http.Request) {
@@ -59,13 +61,14 @@ func (h *CardHandler) CreateCard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(card)
 }
 
+// @ID get-cards-by-account
 // @Summary Get all cards by account ID
 // @Description Returns a list of all cards associated with an account, ordered by creation date.
 // @Tags cards
 // @Produce json
-// @Param accountId path string true "ID of the account"
-// @Success 200 {array} models.Card
-// @Failure 400 {object} api.APIError "Invalid request or validation failed"
+// @Param accountId path string true "Account ID"
+// @Success 200 {array} dto.CardResponse
+// @Failure 400 {object} api.APIError "Invalid account ID"
 // @Failure 404 {object} api.APIError "Account not found"
 // @Failure 500 {object} api.APIError "Failed to retrieve cards"
 // @Router /cards/{accountId} [get]

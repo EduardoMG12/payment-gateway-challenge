@@ -7,6 +7,25 @@ definitions:
       message:
         type: string
     type: object
+  dto.CardResponse:
+    description: Response when a card is created
+    properties:
+      account_id:
+        example: e252f5dd-ded2-4a30-a4a5-6e2940008d54
+        type: string
+      card_token:
+        example: 5b7c16af7278094cd14bd041079111ed00fa832c8a460d8e3f40156408d99475
+        type: string
+      created_at:
+        example: "2025-09-22T19:15:24.526505Z"
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      last_four_digits:
+        example: "8995"
+        type: string
+    type: object
   dto.CreateAccountRequest:
     properties:
       username:
@@ -20,130 +39,116 @@ definitions:
     - username
     type: object
   dto.CreateCardRequest:
+    description: Request body for creating a new card
     properties:
       account_id:
         description: |-
-          @Description Account ID to associate the new card
+          @Description Account ID to associate the new card (UUID)
           @Example e252f5dd-ded2-4a30-a4a5-6e2940008d54
         type: string
     required:
     - account_id
     type: object
   dto.CreateTransactionRequest:
+    description: Request body for creating a new transaction
     properties:
       account_id:
-        description: |-
-          @Description The account's ID for which the transaction will be performed.
-          @Example e7b40123-cb12-41fa-b5bc-5a128448027e
+        description: '@Description The account''s ID for which the transaction will
+          be performed (UUID).'
+        example: e7b40123-cb12-41fa-b5bc-5a128448027e
         type: string
       amount_cents:
-        description: |-
-          @Description The transaction amount in cents. Must be a positive integer.
-          @Example 10000
+        description: '@Description Transaction amount in cents. Must be positive.'
+        example: 10000
         type: integer
       card_token:
-        description: |-
-          @Description The credit card token (optional for some transaction types like DEPOSIT).
-          @Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
+        description: '@Description The credit card token (optional for some transaction
+          types like DEPOSIT).'
+        example: 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
         maxLength: 126
         minLength: 20
         type: string
+      refund_transaction_id:
+        description: '@Description The ID of the transaction being refunded (only
+          for REFUND).'
+        example: 3c2b4791-7f84-4d77-b2e0-56de8df97f33
+        type: string
       type:
-        description: |-
-          @Description The type of transaction. Valid options are: DEPOSIT, PURCHASE, REFUND, CHARGE.
-          @Example PURCHASE
+        description: '@Description Transaction type: DEPOSIT, PURCHASE, REFUND, CHARGE'
         enum:
         - DEPOSIT
         - PURCHASE
         - REFUND
         - CHARGE
+        example: PURCHASE
         type: string
     required:
     - account_id
     - amount_cents
     - type
     type: object
+  dto.ProcessingResponse:
+    description: Response when balance calculation is processing
+    properties:
+      message:
+        example: The account balance is being calculated. Please try again later.
+        type: string
+      status:
+        example: processing
+        type: string
+    type: object
+  dto.ResponseAccountBalance:
+    description: Response for account balance
+    properties:
+      balance_cents:
+        example: 10000
+        type: integer
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
   dto.ResponseCreateTransactionRequest:
+    description: Response returned when a transaction is created or queried
     properties:
       account_id:
-        description: |-
-          @Description The ID of the account associated with the transaction.
-          @Example e7b40123-cb12-41fa-b5bc-5a128448027e
+        example: e7b40123-cb12-41fa-b5bc-5a128448027e
         type: string
       amount_cents:
-        description: |-
-          @Description The transaction amount in cents.
-          @Example 10000
+        example: 10000
         type: integer
       card_id:
-        description: |-
-          @Description The ID of the credit card used for the transaction. It will be null if no card was associated with the transaction.
-          @Example 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
+        example: 16ecac04-9e45-4a5b-b7d4-d6c1c66bafd6
         type: string
       type:
-        description: |-
-          @Description The type of the transaction.
-          @Example PURCHASE
-        enum:
-        - DEPOSIT
-        - PURCHASE
-        - REFUND
-        - CHARGE
+        example: PURCHASE
         type: string
-    required:
-    - account_id
-    - amount_cents
-    - type
     type: object
   models.Account:
     properties:
       created_at:
         description: |-
-          @Description The creation timestamp of the account.
+          @Description Timestamp when the account was created (UTC, RFC3339 format).
+          @Format date-time
           @Example 2025-09-22T19:15:24.526505Z
         type: string
       id:
         description: |-
-          @Description The unique identifier of the account.
+          @Description Unique identifier of the account (UUID).
+          @Format uuid
           @Example 550e8400-e29b-41d4-a716-446655440000
         type: string
       updated_at:
         description: |-
-          @Description The last update timestamp of the account.
+          @Description Timestamp of the last account update (UTC, RFC3339 format).
+          @Format date-time
           @Example 2025-09-22T19:15:24.526505Z
         type: string
       username:
         description: |-
-          @Description The unique username for the account.
+          @Description Unique username chosen by the account owner. Must be unique across the system.
+          @MinLength 3
+          @MaxLength 32
           @Example charlie
-        type: string
-    type: object
-  models.Card:
-    properties:
-      account_id:
-        description: |-
-          @Description The unique identifier of the account this card belongs to.
-          @Example 550e8400-e29b-41d4-a716-446655440000
-        type: string
-      card_token:
-        description: |-
-          @Description The unique, irreversible token for the card.
-          @Example 5b7c16af7278094cd14bd041079111ed00fa832c8a460d8e3f40156408d99475
-        type: string
-      created_at:
-        description: |-
-          @Description The creation timestamp of the card.
-          @Example 2025-09-22T19:15:24.526505Z
-        type: string
-      id:
-        description: |-
-          @Description The unique identifier of the card.
-          @Example 550e8400-e29b-41d4-a716-446655440000
-        type: string
-      last_four_digits:
-        description: |-
-          @Description The last four digits of the card number for identification.
-          @Example 8995
         type: string
     type: object
 host: localhost:8080
@@ -200,13 +205,46 @@ paths:
       summary: Create a new account
       tags:
       - accounts
+  /accounts/{accountId}/balance:
+    get:
+      description: Retrieves the current balance for a specific account.
+      operationId: get-account-balance
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Balance retrieved from cache
+          schema:
+            $ref: '#/definitions/dto.ResponseAccountBalance'
+        "202":
+          description: Balance calculation triggered
+          schema:
+            $ref: '#/definitions/dto.ProcessingResponse'
+        "404":
+          description: Account not found
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.APIError'
+      summary: Get Account Balance
+      tags:
+      - accounts
   /cards:
     post:
       consumes:
       - application/json
-      description: Creates a new, fictional card and associates it with an account.
+      description: Creates a fictional card and associates it with an account.
+      operationId: create-card
       parameters:
-      - description: Account ID to associate the new card
+      - description: Account ID
         in: body
         name: card
         required: true
@@ -216,11 +254,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Card created successfully
           schema:
-            $ref: '#/definitions/models.Card'
+            $ref: '#/definitions/dto.CardResponse'
         "400":
           description: Invalid request body or validation failed
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "404":
+          description: Account not found
           schema:
             $ref: '#/definitions/api.APIError'
         "500":
@@ -234,8 +276,9 @@ paths:
     get:
       description: Returns a list of all cards associated with an account, ordered
         by creation date.
+      operationId: get-cards-by-account
       parameters:
-      - description: ID of the account
+      - description: Account ID
         in: path
         name: accountId
         required: true
@@ -247,10 +290,10 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Card'
+              $ref: '#/definitions/dto.CardResponse'
             type: array
         "400":
-          description: Invalid request or validation failed
+          description: Invalid account ID
           schema:
             $ref: '#/definitions/api.APIError'
         "404":
@@ -268,7 +311,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new transaction in the payment gateway.
+      description: Creates a new transaction (DEPOSIT, PURCHASE, REFUND, CHARGE) in
+        the payment gateway.
+      operationId: create-transaction
       parameters:
       - description: Transaction data
         in: body
@@ -280,11 +325,23 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Transaction created successfully
+          headers:
+            Location:
+              description: URL of the created transaction
+              type: string
           schema:
             $ref: '#/definitions/dto.ResponseCreateTransactionRequest'
         "400":
-          description: Invalid request
+          description: Invalid request body or validation failed
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "404":
+          description: Account not found
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "422":
+          description: Business rule violation (e.g. insufficient funds)
           schema:
             $ref: '#/definitions/api.APIError'
         "500":
@@ -292,11 +349,12 @@ paths:
           schema:
             $ref: '#/definitions/api.APIError'
       summary: Create a new transaction
+      tags:
+      - transactions
   /transactions/{accountId}:
     get:
-      consumes:
-      - application/json
       description: Returns a list of transactions for a specific account.
+      operationId: get-transactions-by-account
       parameters:
       - description: Account ID
         in: path
@@ -314,11 +372,46 @@ paths:
             type: array
         "404":
           description: Account not found
+          schema:
+            $ref: '#/definitions/api.APIError'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/api.APIError'
       summary: Get transactions by Account ID
+      tags:
+      - transactions
+  /transactions/test/{accountId}:
+    get:
+      description: Retrieves a list of all transactions for an account, ordered by
+        creation date (desc).
+      operationId: get-transactions-test
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ResponseCreateTransactionRequest'
+            type: array
+        "404":
+          description: Account not found
+          schema:
+            $ref: '#/definitions/api.APIError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.APIError'
+      summary: Get All Transactions for an Account (Test)
+      tags:
+      - transactions
 schemes:
 - http
 swagger: "2.0"
