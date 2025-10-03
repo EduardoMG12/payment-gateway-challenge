@@ -1,5 +1,3 @@
-use std::f32::consts::E;
-
 use anyhow::Result;
 use sqlx::PgPool;
 
@@ -44,7 +42,12 @@ pub async fn process_transaction(
             .await?;
         }
         Ok(TransactionType::PURCHASE) => {
-            services::purchase_service::process_purchase(tx.clone());
+            services::purchase_service::process_purchase(
+                &transaction_repo,
+                &account_repo,
+                tx.clone(),
+            )
+            .await?;
         }
         Ok(TransactionType::REFUND) => {
             services::refund_service::process_refund(tx.clone());
