@@ -131,6 +131,14 @@ func (s *transactionServiceImpl) GetBalanceFromCache(ctx context.Context, key st
 func (s *transactionServiceImpl) GetBalanceByAccountId(ctx context.Context, accountId string) error {
 	message := map[string]string{"account_id": accountId}
 
+	account, err := s.accountService.GetAccountById(ctx, accountId)
+	if err != nil {
+		return fmt.Errorf("failed to get account by ID: %w", err)
+	}
+	if account == nil {
+		return fmt.Errorf("account not found")
+	}
+
 	messageBytes, err := json.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("failed to serialize message for queue: %w", err)

@@ -75,22 +75,18 @@ func (h *TransactionHandler) GetBalanceByAccountId(w http.ResponseWriter, r *htt
 	ctx := r.Context()
 	vars := mux.Vars(r)
 	accountId := vars["accountId"]
-
-	// Chave do Redis
 	redisKey := "balance:" + accountId
 
-	// 1. Tentar buscar no Redis
 	balance, err := h.service.GetBalanceFromCache(ctx, redisKey)
 
-	if err == redis.Nil { // redis.Nil significa "chave não encontrada" (Cache Miss)
-		// 2. Chave não encontrada: Enviar para a fila
+	if err == redis.Nil {
+
 		err := h.service.GetBalanceByAccountId(ctx, accountId)
 		if err != nil {
 			api.WriteError(w, http.StatusInternalServerError, "Failed to request balance calculation")
 			return
 		}
 
-		// 3. Responder com 202 Accepted
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -98,12 +94,11 @@ func (h *TransactionHandler) GetBalanceByAccountId(w http.ResponseWriter, r *htt
 			"message": "The account balance is being calculated. Please try again in a few moments.",
 		})
 		return
-	} else if err != nil { // Outro erro do Redis
+	} else if err != nil {
 		api.WriteError(w, http.StatusInternalServerError, "Error fetching balance from cache")
 		return
 	}
 
-	// 4. Sucesso (Cache Hit): Retornar o saldo encontrado
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
