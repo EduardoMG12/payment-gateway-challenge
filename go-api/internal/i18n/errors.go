@@ -24,6 +24,7 @@ const (
 	ErrorToFindCards               = "error_to_find_cards"
 	ErrorCreatingTransaction       = "error_creating_transaction"
 	ErrIdempotencyKeyExists        = "err_idempotency_key_exists"
+	ErrorFindAllTransaction        = "error_find_all_transaction"
 )
 
 var errorMessages = map[string]map[string]string{
@@ -46,6 +47,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorToFindCards:               "Error to find cards",
 		ErrorCreatingTransaction:       "Error creating transaction",
 		ErrIdempotencyKeyExists:        "Idempotency key already exists",
+		ErrorFindAllTransaction:        "Error to find all transactions",
 	},
 	"pt-br": {
 		ErrorInvalidRequestBody:        "Corpo da requisição inválido",
@@ -66,6 +68,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorToFindCards:               "Erro ao buscar cartões",
 		ErrorCreatingTransaction:       "Erro ao criar a transação",
 		ErrIdempotencyKeyExists:        "Chave de idempotência já existe",
+		ErrorFindAllTransaction:        "Erro ao buscar todas as transações",
 	},
 }
 

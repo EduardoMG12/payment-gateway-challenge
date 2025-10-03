@@ -113,10 +113,10 @@ func (h *TransactionHandler) GetAllTransactionByAccountIdTestOrderDate(w http.Re
 	vars := mux.Vars(r)
 	accountId := vars["accountId"]
 
-	err, transactions := h.service.GetAllTransactionsByAccountIdTest(r.Context(), accountId)
+	transactions, err := h.service.GetAllTransactionsByAccountIdTest(r.Context(), accountId)
 	fmt.Print("teste")
 	if err != nil {
-		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorCreatingTransaction))
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFindAllTransaction))
 		return
 	}
 
