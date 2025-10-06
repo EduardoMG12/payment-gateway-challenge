@@ -2,5 +2,6 @@
 	"rust-processor/**/*.rs": [
 		"cargo fmt --manifest-path rust-processor/Cargo.toml --"
 	],
-	"*.go": ["goimports -w"]
+	"*.go": ["goimports -w"],
+	"frontend/src/**/*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"]
 }
