@@ -3,5 +3,8 @@
 		"cargo fmt --manifest-path rust-processor/Cargo.toml --"
 	],
 	"*.go": ["goimports -w"],
-	"frontend/src/**/*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"]
+	"frontend/**/*.{js,jsx,ts,tsx}": [
+		"eslint --fix --config frontend/eslint.config.js",
+		"prettier --write"
+	]
 }
