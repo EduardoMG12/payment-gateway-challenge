@@ -1,80 +1,91 @@
-# Como Rodar o Projeto
+# Fictitious Payment Gateway
 
-Para iniciar o projeto, a forma mais rápida e recomendada é usar o script de setup. Ele automatiza a configuração do ambiente, a instalação das dependências e a preparação do banco de dados para desenvolvimento.
+This is a learning project focused on **Rust** and **Go**, where I build a simplified payment gateway. The goal is not to create a market-ready product, but rather to apply software engineering and systems architecture concepts in a practical **fintech** domain.
 
-Se você não tem Docker e Docker Compose instalados, instale-os antes de começar. Caso ainda não possua, baixe e instale o sqlx-cli para gerenciar as migrações do banco de dados.
+The project is a **monorepo** with three main services:
+- A simple **frontend** in React to simulate client interaction.
+- A **Go API** to receive transaction requests.
+- A **Rust processing engine** to execute the core business logic.
 
-1. Setup Rápido para Desenvolvedores
+## System Architecture
 
-Primeiro, torne o script executável. A partir da raiz do projeto, execute o comando:
-```sh
+The project is divided into three main components that communicate asynchronously using RabbitMQ.
 
-chmod +x scripts/setup.sh
+A[Frontend] -->|1. Initiate Transaction| B(Go API);
+B -->|2. Publish to queue| C[RabbitMQ];
+C -->|3. Process Transaction| D(Rust Service);
+D -->|4. Save to Ledger| E[PostgreSQL];
+D -->|5. Update Status| E;
+E --> D;
+B -->|6. Polling for status| A;
 
-``
+## Technologies Used
 
-Em seguida, rode o script. Ele irá:
+* **Frontend:** React, TypeScript, Vite, Tailwind CSS
+* **API:** Go, Gin, Swagger
+* **Processor:** Rust, Tokio, Lapin
+* **Messaging:** RabbitMQ
+* **Database:** PostgreSQL
+* **Cache:** Redis
+* **Containerization:** Docker, Docker Compose
 
-    Copiar o arquivo .env.example para .env.
 
-    Instalar as dependências do Node.js.
+## How to Run the Project
 
-    Configurar o Husky para os hooks do Git.
+### Prerequisites
 
-```sh
+- Docker and Docker Compose
+- `sqlx-cli` installed (`cargo install sqlx-cli`)
 
-./scripts/setup.sh
+### 1. Quick Setup (Development)
 
-```
+To start the project in development mode, follow the steps below:
 
-Depois de executar o script, abra o arquivo .env para configurar as credenciais do seu banco de dados.
+1.  **Make the setup script executable:**
+    ```sh
+    chmod +x scripts/setup.sh
+    ```
 
-2. Inicializar a Infraestrutura e o Banco de Dados
+2.  **Run the setup script:**
+    ```sh
+    ./scripts/setup.sh
+    ```
+   
+This command will copy the `.env` environment files and install the Node.js dependencies.
 
-Agora, inicie os contêineres do PostgreSQL e do RabbitMQ. Eles serão executados em segundo plano.
+3.  **Start the Docker containers:**
+    ```sh
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+    ```
 
-rodar em production
-```sh
+4.  **Run the database migrations:**
+    ```sh
+    export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
+    sqlx migrate run --source go-api/migrations
+    ```
 
-docker-compose up -d
+### 2. Running in Production
 
-```
+To run the project in production mode:
 
-rodar em development
-```sh
+1.  **Copy the production environment file:**
+    ```sh
+    ./scripts/setup.sh
+    ```
 
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+2.  **Start the Docker containers:**
+    ```sh
+    docker-compose up -d --build
+    ```
 
-```
-Em seguida, exporte a variável de ambiente DATABASE_URL no seu terminal e rode as migrações do banco de dados. Isso irá criar as tabelas necessárias para a aplicação.
+3.  **Run the database migrations:**
+    ```sh
+    export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
+    sqlx migrate run --source go-api/migrations
+    ```
+## Monorepo Structure
 
-```sh
-
-export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable"
-sqlx migrate run
-
-```
-
-3. Executar a Aplicação Go
-
-Com a infraestrutura e o banco de dados configurados, você pode iniciar o serviço da API Go.
-
-Vá para o diretório go-api e execute o comando:
-
-```sh
-
-go run cmd/main.go
-
-```
-
-Isso irá iniciar o servidor web. Se tudo estiver correto, você verá a mensagem de sucesso no seu terminal, e sua API estará pronta para receber requisições em http://localhost:8080.
-
-Próximos Passos
-
-Se você precisar parar todos os contêineres e remover os volumes associados, vá para a raiz do projeto e execute:
-
-```sh
-
-docker-compose down --volumes
-
-```
+* `/frontend`: React application.
+* `/go-api`: Go API.
+* `/processor-rust`: Rust processing service.
+* `/scripts`: Setup and utility scripts.
