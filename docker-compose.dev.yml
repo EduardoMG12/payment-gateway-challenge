@@ -24,3 +24,21 @@ services:
       - go-api
     env_file:
       - .env.development
+
+  frontend:
+    container_name: frontend-dev
+    build:
+      target: development
+    ports:
+      - "8082:8081"
+
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - go-api
+    env_file:
+      - .env.development
+    stdin_open: true
+    tty: true
+    command: ["pnpm", "dev"]
