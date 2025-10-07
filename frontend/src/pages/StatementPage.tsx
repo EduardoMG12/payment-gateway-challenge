@@ -132,7 +132,7 @@ export default function StatementPage() {
   };
 
   const filteredTransactions = selectedCard
-    ? transactions.filter((t) => t.card_token === selectedCard)
+    ? transactions.filter((t) => t.card_id === selectedCard)
     : transactions;
 
   if (!accountId) {
