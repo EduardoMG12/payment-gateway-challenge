@@ -52,9 +52,11 @@ func main() {
 	r := router.NewRouter(accountModule.Handler, cardModule.Handler, transactionModule.Handler)
 	r.RegisterRoutes()
 
+	handlerWithCors := config.EnableCors(r.MuxRouter())
+
 	fmt.Println("Server running 🚀🚀🚀   PORT:8080")
 	fmt.Println("go-api: http://localhost:" + os.Getenv("API_PORT"))
 	fmt.Printf("API Swagger doc up: http://localhost:" + os.Getenv("API_PORT") + "/swagger/index.html\n")
 
-	log.Fatal(http.ListenAndServe(":8080", r.MuxRouter()))
+	log.Fatal(http.ListenAndServe(":8080", handlerWithCors))
 }
