@@ -155,7 +155,7 @@ export default function CreateCardPage() {
                       </p>
                       <div className="flex items-center gap-2">
                         <code className="flex-1 rounded bg-secondary px-3 py-2 text-xs font-mono">
-                          {card.card_token}
+                          {card.card_token.substring(0, 40)}...
                         </code>
                         <Button
                           size="sm"

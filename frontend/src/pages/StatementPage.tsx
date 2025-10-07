@@ -57,6 +57,7 @@ export default function StatementPage() {
       toast.error("Erro ao carregar transações");
     } finally {
       setLoading(false);
+      setTransactions([]);
     }
   };
 
@@ -65,9 +66,25 @@ export default function StatementPage() {
 
     try {
       const response = await accountsApi.getBalance(accountId);
-      setBalance(response.data.balance_cents, response.data.status);
+      const data = response.data;
+
+      if ("account_id" in data) {
+        setBalance(data.balance_cents, "CALCULATED");
+      }
+      if ("message" in data) {
+        toast.loading(data.message);
+
+        setTimeout(() => {
+          toast.dismiss();
+        }, 2000);
+
+        setTimeout(() => {
+          loadBalance();
+        }, 1000);
+      }
     } catch (error) {
       console.error("Erro ao carregar saldo:", error);
+      toast.error("Erro ao carregar saldo");
     }
   };
 

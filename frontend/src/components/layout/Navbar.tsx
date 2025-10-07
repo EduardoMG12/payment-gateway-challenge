@@ -31,22 +31,33 @@ export const Navbar = () => {
             <Link to="/" className={navLinkClass("/")}>
               Home
             </Link>
-            <Link
-              to="/create-account"
-              className={navLinkClass("/create-account")}
-            >
-              Criar Conta
-            </Link>
-            <Link to="/create-card" className={navLinkClass("/create-card")}>
-              Criar Cartão
-            </Link>
-            <Link to="/transactions" className={navLinkClass("/transactions")}>
-              Transações
-            </Link>
-            <Link to="/statement" className={navLinkClass("/statement")}>
-              Extrato
-            </Link>
-
+            {!username && (
+              <Link
+                to="/create-account"
+                className={navLinkClass("/create-account")}
+              >
+                Criar Conta
+              </Link>
+            )}
+            {username && (
+              <>
+                <Link
+                  to="/create-card"
+                  className={navLinkClass("/create-card")}
+                >
+                  Criar Cartão
+                </Link>
+                <Link
+                  to="/transactions"
+                  className={navLinkClass("/transactions")}
+                >
+                  Transações
+                </Link>
+                <Link to="/statement" className={navLinkClass("/statement")}>
+                  Extrato
+                </Link>
+              </>
+            )}
             {username && (
               <div className="flex items-center gap-3 border-l pl-6">
                 <div className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5">

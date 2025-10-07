@@ -17,7 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { transactionsApi, accountsApi, Transaction } from "@/services/api";
+import {
+  transactionsApi,
+  accountsApi,
+  Transaction,
+  BalanceResponse,
+} from "@/services/api";
 import { useUserStore } from "@/store/userStore";
 import { FlowModal } from "@/components/FlowModal";
 import toast from "react-hot-toast";
@@ -27,6 +32,7 @@ import {
   RotateCcw,
   Wallet,
 } from "lucide-react";
+import { set } from "react-hook-form";
 
 type TransactionType = "PURCHASE" | "DEPOSIT" | "REFUND";
 
@@ -54,14 +60,34 @@ export default function TransactionsPage() {
 
     try {
       const response = await accountsApi.getBalance(accountId);
-      setBalance(response.data.balance_cents, response.data.status);
+      const data = response.data;
+
+      if ("account_id" in data) {
+        setBalance(data.balance_cents, "CALCULATED");
+      }
+      if ("message" in data) {
+        toast.loading(data.message);
+
+        setTimeout(() => {
+          toast.dismiss();
+        }, 2000);
+
+        setTimeout(() => {
+          loadBalance();
+        }, 1000);
+      }
     } catch (error) {
       console.error("Erro ao carregar saldo:", error);
+      toast.error("Erro ao carregar saldo");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (transactionType === "REFUND") {
+      setAmountCents("10");
+    }
 
     if (!accountId) {
       toast.error("Você precisa criar uma conta primeiro");
