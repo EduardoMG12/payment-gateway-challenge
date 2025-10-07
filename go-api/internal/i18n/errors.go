@@ -25,6 +25,8 @@ const (
 	ErrorCreatingTransaction       = "error_creating_transaction"
 	ErrIdempotencyKeyExists        = "err_idempotency_key_exists"
 	ErrorFindAllTransaction        = "error_find_all_transaction"
+	InfoBalanceProcessing          = "info_balance_processing"
+	ErrorFetchingBalanceFromCache  = "error_fetching_balance_from_cache"
 )
 
 var errorMessages = map[string]map[string]string{
@@ -48,6 +50,8 @@ var errorMessages = map[string]map[string]string{
 		ErrorCreatingTransaction:       "Error creating transaction",
 		ErrIdempotencyKeyExists:        "Idempotency key already exists",
 		ErrorFindAllTransaction:        "Error to find all transactions",
+		InfoBalanceProcessing:          "The account balance is being calculated. Please try again in a few moments.",
+		ErrorFetchingBalanceFromCache:  "Error fetching balance from cache",
 	},
 	"pt-br": {
 		ErrorInvalidRequestBody:        "Corpo da requisição inválido",
@@ -69,6 +73,8 @@ var errorMessages = map[string]map[string]string{
 		ErrorCreatingTransaction:       "Erro ao criar a transação",
 		ErrIdempotencyKeyExists:        "Chave de idempotência já existe",
 		ErrorFindAllTransaction:        "Erro ao buscar todas as transações",
+		InfoBalanceProcessing:          "O saldo da conta está sendo calculado. Por favor, tente novamente em alguns instantes.",
+		ErrorFetchingBalanceFromCache:  "Erro ao buscar saldo do cache",
 	},
 }
 

@@ -94,6 +94,7 @@ func (h *TransactionHandler) GetTransactionByAccountId(w http.ResponseWriter, r 
 // @Router /accounts/{accountId}/balance [get]
 func (h *TransactionHandler) GetBalanceByAccountId(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	lang := i18n.GetLangFromHeader(r)
 	vars := mux.Vars(r)
 	accountId := vars["accountId"]
 	redisKey := "balance:" + accountId
@@ -104,7 +105,7 @@ func (h *TransactionHandler) GetBalanceByAccountId(w http.ResponseWriter, r *htt
 
 		err := h.service.GetBalanceByAccountId(ctx, accountId)
 		if err != nil {
-			api.WriteError(w, http.StatusInternalServerError, "Failed to request balance calculation")
+			api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFetchingBalanceFromCache))
 			return
 		}
 
@@ -112,11 +113,12 @@ func (h *TransactionHandler) GetBalanceByAccountId(w http.ResponseWriter, r *htt
 		w.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "processing",
-			"message": "The account balance is being calculated. Please try again in a few moments.",
+			"message": i18n.GetErrorMessage(lang, i18n.InfoBalanceProcessing),
 		})
 		return
-	} else if err != nil {
-		api.WriteError(w, http.StatusInternalServerError, "Error fetching balance from cache")
+	}
+	if err != nil {
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFetchingBalanceFromCache))
 		return
 	}
 
