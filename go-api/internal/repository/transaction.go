@@ -16,6 +16,8 @@ type TransactionRepository interface {
 	GetTransactionByID(ctx context.Context, txID string) (*models.Transaction, error)
 	FindMostRecentTransaction(ctx context.Context, accountID, txType string, amountCents int64) (*models.Transaction, error)
 	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) (error, []*models.Transaction)
+	GetAllTransactionsByCardId(ctx context.Context, cardId string) ([]*models.Transaction, error)
+	FindTransactionById(ctx context.Context, transactionId string) (*models.Transaction, error)
 }
 
 type transactionRepositoryImpl struct {
@@ -111,4 +113,36 @@ func (r *transactionRepositoryImpl) GetAllTransactionsByAccountIdTest(ctx contex
 	}
 
 	return nil, transactions
+}
+
+func (r *transactionRepositoryImpl) GetAllTransactionsByCardId(ctx context.Context, cardId string) ([]*models.Transaction, error) {
+	query := `
+		SELECT * FROM transactions WHERE card_id = $1;
+	`
+	var transactions []*models.Transaction
+
+	err := r.db.SelectContext(ctx, &transactions, query, cardId)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get transactions: %w", err)
+	}
+
+	return transactions, nil
+}
+
+func (r *transactionRepositoryImpl) FindTransactionById(ctx context.Context, transactionId string) (*models.Transaction, error) {
+	query := `
+		SELECT * FROM transactions WHERE id = $1;
+	`
+	var transaction models.Transaction
+
+	err := r.db.GetContext(ctx, &transaction, query, transactionId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find transaction by id: %w", err)
+	}
+
+	return &transaction, nil
 }

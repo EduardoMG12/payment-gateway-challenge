@@ -27,6 +27,7 @@ const (
 	ErrorFindAllTransaction        = "error_find_all_transaction"
 	InfoBalanceProcessing          = "info_balance_processing"
 	ErrorFetchingBalanceFromCache  = "error_fetching_balance_from_cache"
+	ErrorFindTransactionById       = "error_find_transaction_by_id"
 )
 
 var errorMessages = map[string]map[string]string{
@@ -52,6 +53,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorFindAllTransaction:        "Error to find all transactions",
 		InfoBalanceProcessing:          "The account balance is being calculated. Please try again in a few moments.",
 		ErrorFetchingBalanceFromCache:  "Error fetching balance from cache",
+		ErrorFindTransactionById:       "Error finding transaction by ID",
 	},
 	"pt-br": {
 		ErrorInvalidRequestBody:        "Corpo da requisição inválido",
@@ -75,6 +77,7 @@ var errorMessages = map[string]map[string]string{
 		ErrorFindAllTransaction:        "Erro ao buscar todas as transações",
 		InfoBalanceProcessing:          "O saldo da conta está sendo calculado. Por favor, tente novamente em alguns instantes.",
 		ErrorFetchingBalanceFromCache:  "Erro ao buscar saldo do cache",
+		ErrorFindTransactionById:       "Erro ao buscar transação pelo ID",
 	},
 }
 

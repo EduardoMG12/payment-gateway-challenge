@@ -16,11 +16,12 @@ import (
 )
 
 type TransactionService interface {
-	// GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*Transaction, error)
 	CreateTransaction(ctx context.Context, tx dto.CreateTransactionRequest) (*models.Transaction, error)
 	GetBalanceByAccountId(ctx context.Context, accountId string) error
 	GetBalanceFromCache(ctx context.Context, key string) (string, error)
-	GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) ([]*models.Transaction, error)
+	GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*models.Transaction, error)
+	GetAllTransactionsByCardId(ctx context.Context, cardId string) ([]*models.Transaction, error)
+	FindTransactionById(ctx context.Context, transactionId string) (*models.Transaction, error)
 }
 
 type transactionServiceImpl struct {
@@ -34,9 +35,6 @@ type transactionServiceImpl struct {
 func NewTransactionService(repo repository.TransactionRepository, service account.AccountService, mqClient connection.RabbitMQClient, cardService card.CardService, redis connection.RedisConnection) *transactionServiceImpl {
 	return &transactionServiceImpl{repo: repo, accountService: service, mqClient: mqClient, cardService: cardService, redis: redis}
 }
-
-// func (s *transactionServiceImpl) GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*Transaction, error) {
-// }
 
 func (s *transactionServiceImpl) CreateTransaction(ctx context.Context, req dto.CreateTransactionRequest) (*models.Transaction, error) {
 	timePrefix := time.Now().Format("2006-01-02-15:04:05.000")
@@ -147,7 +145,7 @@ func (s *transactionServiceImpl) GetBalanceByAccountId(ctx context.Context, acco
 	return s.mqClient.Publish(ctx, "calculate_balance_queue", messageBytes)
 }
 
-func (s *transactionServiceImpl) GetAllTransactionsByAccountIdTest(ctx context.Context, accountId string) ([]*models.Transaction, error) {
+func (s *transactionServiceImpl) GetAllTransactionsByAccountId(ctx context.Context, accountId string) ([]*models.Transaction, error) {
 	err, transactions := s.repo.GetAllTransactionsByAccountIdTest(ctx, accountId)
 	if err != nil {
 		return nil, err
@@ -156,4 +154,26 @@ func (s *transactionServiceImpl) GetAllTransactionsByAccountIdTest(ctx context.C
 		return transactions, nil
 	}
 	return transactions, nil
+}
+
+func (s *transactionServiceImpl) GetAllTransactionsByCardId(ctx context.Context, cardId string) ([]*models.Transaction, error) {
+	transactions, err := s.repo.GetAllTransactionsByCardId(ctx, cardId)
+	if err != nil {
+		return nil, err
+	}
+	if len(transactions) > 0 {
+		return transactions, nil
+	}
+	return []*models.Transaction{}, nil
+}
+
+func (s *transactionServiceImpl) FindTransactionById(ctx context.Context, transactionId string) (*models.Transaction, error) {
+	transaction, err := s.repo.FindTransactionById(ctx, transactionId)
+	if err != nil {
+		return nil, err
+	}
+	if transaction != nil {
+		return transaction, nil
+	}
+	return nil, nil
 }

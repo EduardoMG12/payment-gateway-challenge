@@ -146,7 +146,7 @@ func (h *TransactionHandler) GetAllTransactionByAccountIdTestOrderDate(w http.Re
 	vars := mux.Vars(r)
 	accountId := vars["accountId"]
 
-	transactions, err := h.service.GetAllTransactionsByAccountIdTest(r.Context(), accountId)
+	transactions, err := h.service.GetAllTransactionsByAccountId(r.Context(), accountId)
 	fmt.Print("teste")
 	if err != nil {
 		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFindAllTransaction))
@@ -157,4 +157,42 @@ func (h *TransactionHandler) GetAllTransactionByAccountIdTestOrderDate(w http.Re
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(transactions)
 
+}
+
+func (h *TransactionHandler) GetAllTransactionByCardId(w http.ResponseWriter, r *http.Request) {
+	lang := i18n.GetLangFromHeader(r)
+
+	vars := mux.Vars(r)
+	cardId := vars["cardId"]
+
+	transactions, err := h.service.GetAllTransactionsByCardId(r.Context(), cardId)
+	if err != nil {
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFindAllTransaction))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(transactions)
+}
+
+func (h *TransactionHandler) FindTransactionById(w http.ResponseWriter, r *http.Request) {
+	lang := i18n.GetLangFromHeader(r)
+
+	vars := mux.Vars(r)
+	transactionId := vars["transactionId"]
+
+	transaction, err := h.service.FindTransactionById(r.Context(), transactionId)
+	if err != nil {
+		api.WriteError(w, http.StatusInternalServerError, i18n.GetErrorMessage(lang, i18n.ErrorFindTransactionById))
+		return
+	}
+	if transaction == nil {
+		api.WriteError(w, http.StatusNotFound, i18n.GetErrorMessage(lang, i18n.ErrorTransactionNotFound))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(transaction)
 }
