@@ -1,0 +1,443 @@
+{
+	"info": {
+		"_postman_id": "70f97224-823e-4dc0-99e3-a4aa2d5eb1ac",
+		"name": "payment-gateway",
+		"description": "## Documentação Conceitual da API - Payment Gateway\n\nBem-vindo à API do Payment Gateway. Esta coleção foi desenhada para guiá-lo através dos fluxos de trabalho essenciais da nossa plataforma, desde o registo de um novo utilizador até à consulta do seu histórico financeiro.\n\n**Configuração Inicial:**  \nAntes de começar, configure a variável de ambiente `{{base_url}}` no Postman com o endereço da sua API (ex: `http://localhost:8080/api/v1`).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33756963",
+		"_collection_link": "https://planetary-water-186042.postman.co/workspace/91c0d67c-574f-4e9b-afa4-02d37cc1f93f/collection/33756963-70f97224-823e-4dc0-99e3-a4aa2d5eb1ac?action=share&source=collection_link&creator=33756963"
+	},
+	"item": [
+		{
+			"name": "account",
+			"item": [
+				{
+					"name": "GetAccountsWithPagination",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "pt-BR",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateAccount",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "pt-BR",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"csharles\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/accounts",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "### `1. Gestão de Contas (Accounts)`\n\n**Conceito:** A \"Conta\" é a entidade central que representa um utilizador no nosso sistema. Tudo gira em torno dela. É o primeiro passo obrigatório para qualquer interação com o gateway. Pense nela como o perfil do cliente.\n\n#### **`POST`** **Create Account**\n\n- **Propósito:** Registar um novo utilizador na plataforma. Este é o ponto de partida de toda a jornada do cliente. A resposta incluirá o `accountId`, que é a chave fundamental para associar cartões e realizar transações.\n    \n\n#### **`GET`** **Get Accounts With Pagination**\n\n- **Propósito:** Endpoint administrativo para visualizar todas as contas registadas no sistema. Útil para fins de suporte, monitorização ou para ter uma visão geral da base de utilizadores."
+		},
+		{
+			"name": "cards",
+			"item": [
+				{
+					"name": "CreateCard",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_id\": \"{{accountId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/cards",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllCardsByAccountId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "pt-BR",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/cards/{{accountId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cards",
+								"{{accountId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "# `2. Gestão de Cartões (Cards)`\n\n**Conceito:** Esta secção foca-se nos métodos de pagamento. Cada \"Cartão\" é um método de pagamento seguro, tokenizado, e sempre associado a uma \"Conta\" específica. Nenhuma transação financeira pode ocorrer sem um cartão.\n\n#### **`POST`** **Create Card**\n\n- **Propósito:** Associar um novo método de pagamento a um utilizador existente. Após a criação de uma conta, este endpoint \"tokeniza\" o cartão de forma segura e devolve apenas informações não sensíveis, como os últimos quatro dígitos, para que possa ser exibido ao utilizador.\n    \n\n#### **`GET`** **Get All Cards By Account Id**\n\n- **Propósito:** Listar todos os métodos de pagamento guardados de um utilizador. Ideal para ser usado em ecrãs como \"A minha carteira\" ou \"Gerir métodos de pagamento\", permitindo que o utilizador veja os cartões que já associou à sua conta.\n    \n\n---"
+		},
+		{
+			"name": "transactions",
+			"item": [
+				{
+					"name": "CreateTransaction",
+					"item": [
+						{
+							"name": "DEPOSIT",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\":     \"{{accountId}}\",\n\t\"amount_cents\":    1000,         \n\t\"type\":           \"DEPOSIT\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "REFUND",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\":     \"0ae14e56-f57f-421d-89c0-d805b5b05abd\",\n\t\"amount_cents\":    20001, // Label value is not important         \n    \"refund_transaction_id\" : \"{{refund_transaction_id}}\",\n\t\"type\":           \"REFUND\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PURCHASE",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\":     \"{{accountId}}\",\n\t\"amount_cents\":    20,         \n\t\"type\":           \"PURCHASE\",\n    \"card_token\": \"{{cardToken}}\" // Optional label\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "#### `Criação de Transações`\n\n**Fluxo de Trabalho:** Ao enviar uma requisição para qualquer um destes endpoints, a API valida os dados e, se estiverem corretos, aceita a transação para processamento, respondendo com um `202 Accepted`. Use o `transactionId` retornado para futuras consultas sobre o estado dessa transação.\n\n- **`POST`** **DEPOSIT:**\n    \n    - **Cenário de Uso:** Simula um utilizador a adicionar fundos à sua conta. É uma operação de crédito no saldo do utilizador.\n        \n- **`POST`** **PURCHASE:**\n    \n    - **Cenário de Uso:** Simula um pagamento ou compra de um produto/serviço. É a operação mais comum de débito no saldo do utilizador.\n        \n- **`POST`** **REFUND:**\n    \n    - **Cenário de Uso:** Simula o estorno de uma compra anterior. É crucial notar que um estorno está logicamente ligado a uma compra original. Por isso, é necessário fornecer o `originalTransactionId` da compra que está a ser estornada, garantindo a integridade do livro-razão (ledger)."
+				},
+				{
+					"name": "ConsultingFinancial",
+					"item": [
+						{
+							"name": "GetBalance",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\":     \"e7b40123-cb12-41fa-b5bc-5a128448027e\",\n\t\"amount_cents\":    10000,         \n  // \"card_token\":     \"2f859579bf94f001f7d2216ace840bf100dd8c7923f8e021509627c540f413e0\",\n\t\"type\":           \"DEPOSIT\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/accounts/{{accountId}}/balance",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"accounts",
+										"{{accountId}}",
+										"balance"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAllTransactionByAccountIdOrderByDate",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions/{{accountId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions",
+										"{{accountId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetTransactionByTransactionId",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions/id/{{transactionId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions",
+										"id",
+										"{{transactionId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAllTransactionsByCardId",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "pt-BR",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"account_id\":     \"e7b40123-cb12-41fa-b5bc-5a128448027e\",\n\t\"amount_cents\":    10000,         \n  // \"card_token\":     \"2f859579bf94f001f7d2216ace840bf100dd8c7923f8e021509627c540f413e0\",\n\t\"type\":           \"DEPOSIT\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/transactions/card/{{cardId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"transactions",
+										"card",
+										"{{cardId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "#### `Consultas Financeiras`\n\n**Conceito:** Estes endpoints fornecem a visibilidade necessária sobre a saúde financeira e o histórico de uma conta, permitindo construir extratos e dashboards.\n\n- **`GET`** **Get Balance:**\n    \n    - **Propósito:** Obter o saldo consolidado e atual de uma conta. A resposta inclui um estado (`status`) que informa se o saldo está totalmente atualizado (`CALCULATED`) ou se ainda existem transações a serem processadas (`PROCESSING`), dando uma visão transparente do estado financeiro.\n        \n- **`GET`** **Get All Transactions By Account Id**\n    \n    - **Propósito:** Funciona como o extrato bancário completo do utilizador. Retorna todo o histórico de transações associadas a uma conta, ordenado por data, permitindo reconstruir todo o fluxo financeiro.\n        \n- **`GET`** **Get All Transactions By Card Id**\n    \n    - **Propósito:** Obter o extrato de um cartão específico. Útil para quando o utilizador quer ver apenas as transações feitas com um determinado método de pagamento.\n        \n- **`GET`** **Get Transaction By Transaction Id**\n    \n    - **Propósito:** Consultar o estado e os detalhes de uma única transação. Ideal para verificar se um depósito foi concluído, obter os detalhes de uma compra específica ou rastrear o estado de um estorno."
+				}
+			],
+			"description": "### `3. Operações e Histórico Financeiro (Transactions)`\n\n**Conceito:** O coração do gateway de pagamento. Aqui tratamos da criação de transações (débitos e créditos) e da consulta de saldos e extratos. Todas as transações são processadas de forma **assíncrona**: a API valida e enfileira a sua requisição, respondendo imediatamente com um `ID de Transação`. O processamento real acontece em segundo plano, garantindo a resiliência do sistema."
+		}
+	]
+}

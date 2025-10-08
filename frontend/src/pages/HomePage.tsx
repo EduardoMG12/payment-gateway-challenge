@@ -13,9 +13,33 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRight, Database, Lock, Zap, Code2 } from "lucide-react";
+import {
+  ArrowRight,
+  Database,
+  Lock,
+  Zap,
+  Code2,
+  Download,
+  ExternalLink,
+  FileText,
+} from "lucide-react";
+import postmanCollection from "../../public/payment-gateway.postman_collection.json";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function HomePage() {
+  const downloadPostmanCollection = () => {
+    const dataStr = JSON.stringify(postmanCollection, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+
+    const exportFileDefaultName = "Payment_Gateway_API_Collection.json";
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    linkElement.click();
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -135,6 +159,75 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* API Documentation Section */}
+      <section className="py-16 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="mb-8 text-center text-3xl font-bold">
+              Documentação da API
+            </h2>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Swagger Card */}
+              <Card className="shadow-card hover:shadow-elegant transition-shadow">
+                <CardHeader>
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="rounded-lg bg-gradient-primary p-2">
+                      <FileText className="h-5 w-5 text-primary-foreground" />
+                    </div>
+                    <CardTitle>Swagger API Docs</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Documentação interativa da API com todos os endpoints
+                    disponíveis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild className="w-full gap-2">
+                    <a
+                      href={`${API_BASE_URL}/swagger/index.html`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Abrir Swagger
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Postman Card */}
+              <Card className="shadow-card hover:shadow-elegant transition-shadow">
+                <CardHeader>
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="rounded-lg bg-gradient-success p-2">
+                      <Download className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle>Postman Collection</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Baixe a coleção do Postman com exemplos de todas as
+                    requisições
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    asChild
+                    variant="secondary"
+                    className="w-full gap-2"
+                    onClick={downloadPostmanCollection}
+                  >
+                    <div>
+                      <Download className="h-4 w-4" />
+                      Baixar Collection
+                    </div>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Key Concepts Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -200,7 +293,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-primary py-16 text-primary-foreground">
+      <section className="bg-gradient-primary py-16 text-primary-foreground mt-0">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-4 text-3xl font-bold">Pronto para começar?</h2>
           <p className="mb-8 text-lg opacity-90">
