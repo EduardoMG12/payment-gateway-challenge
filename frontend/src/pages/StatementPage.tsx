@@ -31,6 +31,10 @@ import toast from "react-hot-toast";
 
 export default function StatementPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionsFilteredByCard, setTransactionsFilteredByCard] = useState<
+    Transaction[]
+  >([]);
+
   const [loading, setLoading] = useState(true);
   const [selectedCard, setSelectedCard] = useState<string>("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -45,6 +49,21 @@ export default function StatementPage() {
     }
   }, [accountId]);
 
+  useEffect(() => {
+    loadTransactionsFilteredByCard(selectedCard);
+    console.log("Selected Card:", selectedCard);
+    console.log(transactionsFilteredByCard);
+  }, [selectedCard]);
+
+  const loadTransactionsFilteredByCard = async (cardId: string) => {
+    if (!accountId) return;
+
+    if (cardId) {
+      const response = await transactionsApi.getByCardId(cardId);
+      setTransactionsFilteredByCard(response.data);
+    }
+  };
+
   const loadTransactions = async () => {
     if (!accountId) return;
 
@@ -57,7 +76,6 @@ export default function StatementPage() {
       toast.error("Erro ao carregar transações");
     } finally {
       setLoading(false);
-      setTransactions([]);
     }
   };
 
@@ -147,10 +165,6 @@ export default function StatementPage() {
         return <Badge variant="outline">{type}</Badge>;
     }
   };
-
-  const filteredTransactions = selectedCard
-    ? transactions.filter((t) => t.card_id === selectedCard)
-    : transactions;
 
   if (!accountId) {
     return (
@@ -309,7 +323,7 @@ export default function StatementPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {cards.map((card) => (
-                        <SelectItem key={card.id} value={card.card_token}>
+                        <SelectItem key={card.id} value={card.id}>
                           <div className="flex items-center gap-2">
                             <CreditCard className="h-4 w-4" />
                             •••• {card.last_four_digits}
@@ -331,7 +345,7 @@ export default function StatementPage() {
                   <div className="py-12 text-center text-muted-foreground">
                     Carregando transações...
                   </div>
-                ) : filteredTransactions.length === 0 ? (
+                ) : transactionsFilteredByCard.length === 0 ? (
                   <div className="py-12 text-center">
                     <Receipt className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                     <p className="text-muted-foreground">
@@ -352,7 +366,7 @@ export default function StatementPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredTransactions.map((transaction) => (
+                        {transactionsFilteredByCard.map((transaction) => (
                           <TableRow key={transaction.id}>
                             <TableCell className="font-mono text-xs">
                               {transaction.id.substring(0, 8)}...

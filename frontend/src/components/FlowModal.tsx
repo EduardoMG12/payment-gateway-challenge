@@ -130,7 +130,8 @@ export function FlowModal({
       // Check transaction status at key points
       if (i === 4 || i === 7) {
         try {
-          const response = await transactionsApi.get(transactionId);
+          const response =
+            await transactionsApi.getByTransactionId(transactionId);
           setCurrentTransaction(response.data);
 
           if (response.data.status === "REJECTED") {
@@ -152,7 +153,7 @@ export function FlowModal({
 
     // Final transaction fetch
     try {
-      const response = await transactionsApi.get(transactionId);
+      const response = await transactionsApi.getByTransactionId(transactionId);
       setCurrentTransaction(response.data);
       onComplete?.(response.data);
     } catch (error) {

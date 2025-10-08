@@ -83,6 +83,8 @@ export const transactionsApi = {
     api.post<Transaction>("/transactions", data),
   list: (accountId: string) =>
     api.get<Transaction[]>(`/transactions/${accountId}`),
-  get: (transactionId: string) =>
-    api.get<Transaction>(`/transactions/${transactionId}`),
+  getByTransactionId: (transactionId: string) =>
+    api.get<Transaction>(`/transactions/id/${transactionId}`),
+  getByCardId: (cardId: string) =>
+    api.get<Transaction[]>(`/transactions/card/${cardId}`),
 };
