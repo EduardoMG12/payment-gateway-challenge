@@ -37,76 +37,84 @@ interface FlowStep {
   status: "pending" | "processing" | "completed" | "failed";
 }
 
+const beginFlowHardcoded: FlowStep[] = [
+  {
+    id: "frontend",
+    label: "Frontend enviando requisição para API...",
+    icon: ArrowRight,
+    status: "processing",
+  },
+  {
+    id: "api-receive",
+    label: "API Go recebeu requisição, validando dados...",
+    icon: Server,
+    status: "pending",
+  },
+  {
+    id: "api-publish",
+    label: "API Go publicando mensagem na fila...",
+    icon: MessageSquare,
+    status: "pending",
+  },
+  {
+    id: "rabbitmq",
+    label: "RabbitMQ - Mensagem enfileirada...",
+    icon: MessageSquare,
+    status: "pending",
+  },
+  {
+    id: "rust-consume",
+    label: "Processador Rust consumiu mensagem...",
+    icon: Cpu,
+    status: "pending",
+  },
+  {
+    id: "rust-business",
+    label: "Aplicando regras de negócio (saldo, idempotência)...",
+    icon: Shield,
+    status: "pending",
+  },
+  {
+    id: "postgres",
+    label: "PostgreSQL persistindo transação...",
+    icon: Database,
+    status: "pending",
+  },
+  {
+    id: "redis",
+    label: "Redis atualizando cache de saldo...",
+    icon: Coins,
+    status: "pending",
+  },
+  {
+    id: "complete",
+    label: "Transação concluída!",
+    icon: CheckCircle2,
+    status: "pending",
+  },
+];
+
 export function FlowModal({
   open,
   onOpenChange,
   transactionId,
   onComplete,
 }: FlowModalProps) {
-  const [steps, setSteps] = useState<FlowStep[]>([
-    {
-      id: "frontend",
-      label: "Frontend enviando requisição para API...",
-      icon: ArrowRight,
-      status: "processing",
-    },
-    {
-      id: "api-receive",
-      label: "API Go recebeu requisição, validando dados...",
-      icon: Server,
-      status: "pending",
-    },
-    {
-      id: "api-publish",
-      label: "API Go publicando mensagem na fila...",
-      icon: MessageSquare,
-      status: "pending",
-    },
-    {
-      id: "rabbitmq",
-      label: "RabbitMQ - Mensagem enfileirada...",
-      icon: MessageSquare,
-      status: "pending",
-    },
-    {
-      id: "rust-consume",
-      label: "Processador Rust consumiu mensagem...",
-      icon: Cpu,
-      status: "pending",
-    },
-    {
-      id: "rust-business",
-      label: "Aplicando regras de negócio (saldo, idempotência)...",
-      icon: Shield,
-      status: "pending",
-    },
-    {
-      id: "postgres",
-      label: "PostgreSQL persistindo transação...",
-      icon: Database,
-      status: "pending",
-    },
-    {
-      id: "redis",
-      label: "Redis atualizando cache de saldo...",
-      icon: Coins,
-      status: "pending",
-    },
-    {
-      id: "complete",
-      label: "Transação concluída!",
-      icon: CheckCircle2,
-      status: "pending",
-    },
-  ]);
+  const [steps, setSteps] = useState<FlowStep[]>(beginFlowHardcoded);
   const [currentTransaction, setCurrentTransaction] =
     useState<Transaction | null>(null);
   const [disableAnimation, setDisableAnimation] = useState(() => {
     return localStorage.getItem("disableFlowAnimation") === "true";
   });
 
+  const resetFlow = () => {
+    setSteps(beginFlowHardcoded);
+    setCurrentTransaction(null);
+  };
+
   useEffect(() => {
     if (open && transactionId) {
+      resetFlow();
       simulateFlow();
     }
   }, [open, transactionId]);
@@ -179,8 +187,15 @@ export function FlowModal({
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      resetFlow();
+    }
+    onOpenChange(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Fluxo da Transação</DialogTitle>
