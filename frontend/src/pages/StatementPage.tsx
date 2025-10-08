@@ -51,8 +51,6 @@ export default function StatementPage() {
 
   useEffect(() => {
     loadTransactionsFilteredByCard(selectedCard);
-    console.log("Selected Card:", selectedCard);
-    console.log(transactionsFilteredByCard);
   }, [selectedCard]);
 
   const loadTransactionsFilteredByCard = async (cardId: string) => {
