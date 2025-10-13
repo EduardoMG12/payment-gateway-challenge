@@ -31,6 +31,9 @@ func NewRouter(accountHandler *account.AccountHandler, cardHandler *card.CardHan
 }
 
 func (r *Router) RegisterRoutes() {
+	// Health check endpoint
+	r.muxRouter.HandleFunc("/health", r.healthCheck).Methods("GET")
+
 	r.muxRouter.HandleFunc("/accounts", r.AccountHandler.CreateAccount).Methods("POST")
 	r.muxRouter.HandleFunc("/accounts", r.AccountHandler.GetAllAccounts).Methods("GET")
 	r.muxRouter.HandleFunc("/accounts/{accountId}/balance", r.TransactionHandler.GetBalanceByAccountId).Methods("GET")
@@ -44,4 +47,10 @@ func (r *Router) RegisterRoutes() {
 	r.muxRouter.HandleFunc("/transactions/{accountId}", r.TransactionHandler.GetAllTransactionByAccountIdTestOrderDate).Methods("GET")
 	r.muxRouter.HandleFunc("/transactions/card/{cardId}", r.TransactionHandler.GetAllTransactionByCardId).Methods("GET")
 	r.muxRouter.HandleFunc("/transactions/id/{transactionId}", r.TransactionHandler.FindTransactionById).Methods("GET")
+}
+
+func (r *Router) healthCheck(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"status": "healthy", "service": "go-api"}`))
 }

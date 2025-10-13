@@ -55,6 +55,10 @@ func (r *cardRepositoryImpl) GetAllCardsByAccountId(ctx context.Context, account
 		return nil, fmt.Errorf("failed to get cards: %w", err)
 	}
 
+	if cards == nil {
+		cards = []*models.Card{}
+	}
+
 	return cards, nil
 }
 
