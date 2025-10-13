@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster as HotToaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import HomePage from "./pages/HomePage";
@@ -33,38 +34,40 @@ const AppContent = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <HotToaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "hsl(var(--card))",
-            color: "hsl(var(--card-foreground))",
-            border: "1px solid hsl(var(--border))",
-          },
-          success: {
-            iconTheme: {
-              primary: "hsl(var(--success))",
-              secondary: "hsl(var(--success-foreground))",
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <HotToaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "hsl(var(--card))",
+              color: "hsl(var(--card-foreground))",
+              border: "1px solid hsl(var(--border))",
             },
-          },
-          error: {
-            iconTheme: {
-              primary: "hsl(var(--destructive))",
-              secondary: "hsl(var(--destructive-foreground))",
+            success: {
+              iconTheme: {
+                primary: "hsl(var(--success))",
+                secondary: "hsl(var(--success-foreground))",
+              },
             },
-          },
-        }}
-      />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+            error: {
+              iconTheme: {
+                primary: "hsl(var(--destructive))",
+                secondary: "hsl(var(--destructive-foreground))",
+              },
+            },
+          }}
+        />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

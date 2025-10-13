@@ -23,11 +23,49 @@ import {
   ExternalLink,
   FileText,
 } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 import postmanCollection from "../../public/payment-gateway.postman_collection.json";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function HomePage() {
+  const seoData = useSEO({
+    title: "PayGateway - Gateway de Pagamento Fictício",
+    description:
+      "Sistema completo de gateway de pagamento desenvolvido com arquitetura moderna usando Rust, Go e React. Processamento seguro de transações financeiras com API RESTful completa.",
+    keywords:
+      "gateway de pagamento, processamento de transações, fintech, rust, go, react, sistema financeiro, api de pagamentos, transações seguras, sistema distribuído",
+    ogType: "website",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "PayGateway",
+      description:
+        "Sistema completo de gateway de pagamento com arquitetura moderna",
+      url: "https://paygateway.exemplo.com",
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "BRL",
+      },
+      creator: {
+        "@type": "Person",
+        name: "Eduardo MG",
+        url: "https://github.com/EduardoMG12",
+      },
+      features: [
+        "Processamento de transações",
+        "Gerenciamento de contas",
+        "Criação de cartões virtuais",
+        "Extratos detalhados",
+        "API RESTful",
+        "Arquitetura distribuída",
+      ],
+    },
+  });
+
   const downloadPostmanCollection = () => {
     const dataStr = JSON.stringify(postmanCollection, null, 2);
     const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
@@ -42,6 +80,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      {seoData}
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-hero py-20 text-primary-foreground">
         <div className="container mx-auto px-4">

@@ -26,10 +26,39 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { transactionsApi, accountsApi, Transaction } from "@/services/api";
 import { useUserStore } from "@/store/userStore";
+import { useSEO } from "@/hooks/useSEO";
 import { Receipt, CreditCard, Copy, Check, Wallet } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function StatementPage() {
+  // SEO Configuration
+  const seoData = useSEO({
+    title: "Extrato e Histórico - PayGateway",
+    description:
+      "Visualize seu extrato completo, histórico de transações, saldo atual e filtre operações por cartão no PayGateway. Controle total das suas finanças.",
+    keywords:
+      "extrato bancário, histórico transações, saldo conta, relatório financeiro, extrato cartão, consulta saldo, movimentação financeira",
+    ogType: "webapp",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Extrato e Histórico - PayGateway",
+      description:
+        "Página de consulta de extrato e histórico de transações financeiras",
+      url: "https://paygateway.exemplo.com/statement",
+      mainEntity: {
+        "@type": "FinancialProduct",
+        name: "Extrato Bancário Digital",
+        description:
+          "Serviço de consulta de extrato e histórico de movimentações",
+        provider: {
+          "@type": "FinancialService",
+          name: "PayGateway",
+        },
+      },
+    },
+  });
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionsFilteredByCard, setTransactionsFilteredByCard] = useState<
     Transaction[]
@@ -186,6 +215,7 @@ export default function StatementPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {seoData}
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">Extrato</h1>

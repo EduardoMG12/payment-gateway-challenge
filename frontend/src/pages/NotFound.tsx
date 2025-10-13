@@ -3,9 +3,27 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Home, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSEO } from "@/hooks/useSEO";
 
 const NotFound = () => {
   const location = useLocation();
+
+  // SEO Configuration
+  const seoData = useSEO({
+    title: "Página não encontrada - PayGateway",
+    description:
+      "A página que você está procurando não foi encontrada. Retorne à página inicial do PayGateway ou explore nossas funcionalidades de gateway de pagamento.",
+    keywords: "página não encontrada, erro 404, paygateway, voltar início",
+    noindex: true, // Para não indexar páginas 404
+    ogType: "website",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Página não encontrada - 404",
+      description: "Página de erro para URLs não encontradas",
+      url: `https://paygateway.exemplo.com${location.pathname}`,
+    },
+  });
 
   useEffect(() => {
     console.error(
@@ -16,6 +34,7 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+      {seoData}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

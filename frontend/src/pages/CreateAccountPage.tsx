@@ -12,10 +12,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { accountsApi } from "@/services/api";
 import { useUserStore } from "@/store/userStore";
+import { useSEO } from "@/hooks/useSEO";
 import toast from "react-hot-toast";
 import { UserPlus } from "lucide-react";
 
 export default function CreateAccountPage() {
+  const seoData = useSEO({
+    title: "Criar Conta - PayGateway",
+    description:
+      "Crie sua conta gratuita no PayGateway e comece a processar transações de forma segura. Cadastro rápido e fácil para acessar todas as funcionalidades do sistema.",
+    keywords:
+      "criar conta, cadastro gratuito, registro paygateway, nova conta, conta financeira, cadastro sistema pagamento",
+    ogType: "website",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Criar Conta - PayGateway",
+      description:
+        "Página de cadastro para criar nova conta no sistema PayGateway",
+      url: "https://paygateway.exemplo.com/create-account",
+      mainEntity: {
+        "@type": "CreateAction",
+        name: "Criar Conta",
+        description: "Formulário para criação de nova conta de usuário",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://paygateway.exemplo.com/create-account",
+          actionApplication: {
+            "@type": "WebApplication",
+            name: "PayGateway",
+          },
+        },
+      },
+    },
+  });
+
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -46,6 +77,7 @@ export default function CreateAccountPage() {
 
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">
+      {seoData}
       <Card className="w-full max-w-md shadow-elegant">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-primary">

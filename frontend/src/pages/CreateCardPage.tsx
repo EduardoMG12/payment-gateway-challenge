@@ -9,10 +9,37 @@ import {
 } from "@/components/ui/card";
 import { cardsApi } from "@/services/api";
 import { useUserStore } from "@/store/userStore";
+import { useSEO } from "@/hooks/useSEO";
 import toast from "react-hot-toast";
 import { CreditCard, Plus, Copy, Check } from "lucide-react";
 
 export default function CreateCardPage() {
+  const seoData = useSEO({
+    title: "Criar Cartão Virtual - PayGateway",
+    description:
+      "Crie cartões virtuais seguros para suas transações no PayGateway. Gere tokens únicos e gerencie seus métodos de pagamento de forma segura e eficiente.",
+    keywords:
+      "criar cartão virtual, cartão digital, token seguro, método de pagamento, cartão online, pagamento seguro",
+    ogType: "website",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Criar Cartão Virtual - PayGateway",
+      description: "Interface para criação e gerenciamento de cartões virtuais",
+      url: "https://paygateway.exemplo.com/create-card",
+      mainEntity: {
+        "@type": "CreateAction",
+        name: "Criar Cartão Virtual",
+        description:
+          "Ferramenta para gerar novos cartões virtuais com tokens seguros",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://paygateway.exemplo.com/create-card",
+        },
+      },
+    },
+  });
+
   const [loading, setLoading] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const { accountId, username, cards, setCards, addCard } = useUserStore();
@@ -87,6 +114,7 @@ export default function CreateCardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {seoData}
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">Meus Cartões</h1>

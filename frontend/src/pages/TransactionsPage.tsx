@@ -25,6 +25,7 @@ import {
 } from "@/services/api";
 import { useUserStore } from "@/store/userStore";
 import { FlowModal } from "@/components/FlowModal";
+import { useSEO } from "@/hooks/useSEO";
 import toast from "react-hot-toast";
 import {
   ArrowUpCircle,
@@ -37,6 +38,30 @@ import { set } from "react-hook-form";
 type TransactionType = "PURCHASE" | "DEPOSIT" | "REFUND";
 
 export default function TransactionsPage() {
+  const seoData = useSEO({
+    title: "Transações - PayGateway",
+    description:
+      "Realize transações seguras, processamento de pagamentos, estornos e gerencie suas operações financeiras no PayGateway. Interface completa para operações bancárias.",
+    keywords:
+      "transações financeiras, processar pagamento, estorno, operações bancárias, transferência, pagamento online, transação segura",
+    ogType: "webapp",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Transações - PayGateway",
+      description:
+        "Interface para processamento de transações e operações financeiras",
+      url: "https://paygateway.exemplo.com/transactions",
+      mainEntity: {
+        "@type": "FinancialService",
+        name: "Processamento de Transações",
+        description:
+          "Serviço para processamento seguro de transações financeiras",
+        serviceType: "Payment Processing",
+      },
+    },
+  });
+
   const [transactionType, setTransactionType] =
     useState<TransactionType>("PURCHASE");
   const [amountCents, setAmountCents] = useState("");
@@ -167,6 +192,7 @@ export default function TransactionsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {seoData}
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">Realizar Transação</h1>
