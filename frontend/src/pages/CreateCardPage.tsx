@@ -149,7 +149,7 @@ export default function CreateCardPage() {
 
         <div>
           <h2 className="mb-4 text-xl font-semibold">Cartões existentes</h2>
-          {cards.length === 0 ? (
+          {!cards || cards.length === 0 ? (
             <Card className="shadow-card">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <CreditCard className="mb-4 h-16 w-16 text-muted-foreground" />
@@ -160,7 +160,7 @@ export default function CreateCardPage() {
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              {cards.map((card) => (
+              {cards?.map((card) => (
                 <Card key={card.id} className="shadow-card">
                   <CardContent className="pt-6">
                     <div className="mb-4 flex items-start justify-between">

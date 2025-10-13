@@ -86,8 +86,15 @@ export default function StatementPage() {
     if (!accountId) return;
 
     if (cardId) {
-      const response = await transactionsApi.getByCardId(cardId);
-      setTransactionsFilteredByCard(response.data);
+      try {
+        const response = await transactionsApi.getByCardId(cardId);
+        setTransactionsFilteredByCard(response.data || []);
+      } catch (error) {
+        console.error("Erro ao carregar transações do cartão:", error);
+        setTransactionsFilteredByCard([]);
+      }
+    } else {
+      setTransactionsFilteredByCard([]);
     }
   };
 
@@ -97,9 +104,10 @@ export default function StatementPage() {
     setLoading(true);
     try {
       const response = await transactionsApi.list(accountId);
-      setTransactions(response.data);
+      setTransactions(response.data || []);
     } catch (error) {
       console.error("Erro ao carregar transações:", error);
+      setTransactions([]);
       toast.error("Erro ao carregar transações");
     } finally {
       setLoading(false);
@@ -271,7 +279,7 @@ export default function StatementPage() {
                   <div className="py-12 text-center text-muted-foreground">
                     Carregando transações...
                   </div>
-                ) : transactions.length === 0 ? (
+                ) : !transactions || transactions.length === 0 ? (
                   <div className="py-12 text-center">
                     <Receipt className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                     <p className="text-muted-foreground">
@@ -292,7 +300,7 @@ export default function StatementPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {transactions.map((transaction) => (
+                        {transactions?.map((transaction) => (
                           <TableRow key={transaction.id}>
                             <TableCell className="font-mono text-xs">
                               {transaction.id.substring(0, 8)}...
@@ -373,7 +381,8 @@ export default function StatementPage() {
                   <div className="py-12 text-center text-muted-foreground">
                     Carregando transações...
                   </div>
-                ) : transactionsFilteredByCard.length === 0 ? (
+                ) : !transactionsFilteredByCard ||
+                  transactionsFilteredByCard.length === 0 ? (
                   <div className="py-12 text-center">
                     <Receipt className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                     <p className="text-muted-foreground">
@@ -394,7 +403,7 @@ export default function StatementPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {transactionsFilteredByCard.map((transaction) => (
+                        {transactionsFilteredByCard?.map((transaction) => (
                           <TableRow key={transaction.id}>
                             <TableCell className="font-mono text-xs">
                               {transaction.id.substring(0, 8)}...
